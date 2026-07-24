@@ -114,27 +114,7 @@ const PROVIDERS = {
       { id: 'openrouter/auto', name: 'Auto Router' }
     ]
   },
-  opencode: {
-    name: 'OpenCode Zen',
-    adapter: 'openai',
-    baseUrl: 'https://opencode.ai/zen/v1',
-    docsUrl: 'https://opencode.ai/docs/zen',
-    keyPlaceholder: '…',
-    allowCustomModel: true,
-    models: [
-      { id: 'opencode/big-pickle', name: 'Big Pickle', free: true },
-      { id: 'opencode/deepseek-v4-flash-free', name: 'DeepSeek V4 Flash', free: true },
-      { id: 'opencode/mimo-v2.5-free', name: 'MiMo V2.5', free: true },
-      { id: 'opencode/laguna-s-2.1-free', name: 'Laguna S 2.1', free: true },
-      { id: 'opencode/north-mini-code-free', name: 'North Mini Code', free: true },
-      { id: 'opencode/nemotron-3-ultra-free', name: 'Nemotron 3 Ultra', free: true }
-    ]
-  }
 };
-
-/* Zen exposes several API families. This app deliberately uses Chat Completions
-   for Zen, so these documented model families must not be sent to that route. */
-const ZEN_NON_CHAT_COMPLETIONS_PREFIXES = ['gpt-', 'claude-', 'gemini-', 'qwen'];
 
 const PROVIDER_KEYS = Object.keys(PROVIDERS);
 const UI_ASSETS = {
@@ -198,7 +178,6 @@ const state = {
   selectedProvider: 'openai',
   selectedModel: 'gpt-5.6-sol',
   themePreference: 'system',
-  zenModels: [],
   streaming: false,
   streamingMessageId: null,
   abortController: null,
@@ -375,39 +354,10 @@ function normaliseUrl(value) {
   }
 }
 
-function zenRelayUrl() {
-  return normaliseUrl(state.settings.zenProxyUrl);
-}
-
-function hasZenRelay() {
-  return Boolean(zenRelayUrl());
-}
-
-function requestBaseUrl(providerKey, fallbackUrl) {
-  return providerKey === 'opencode' && hasZenRelay() ? zenRelayUrl() : fallbackUrl;
-}
-
-function zenApiModelId(modelId) {
-  return String(modelId || '').replace(/^opencode\//, '');
-}
-
-function zenSupportsChatCompletions(modelId) {
-  const bareId = zenApiModelId(modelId);
-  return !ZEN_NON_CHAT_COMPLETIONS_PREFIXES.some(function (prefix) {
-    return bareId.indexOf(prefix) === 0;
-  });
-}
-
 function modelsFor(providerKey) {
   const provider = PROVIDERS[providerKey];
   if (!provider) return [];
-  const staticModels = provider.models || [];
-  if (providerKey !== 'opencode' || state.zenModels.length === 0) return staticModels;
-
-  const knownIds = new Set(staticModels.map(function (model) { return model.id; }));
-  return staticModels.concat(state.zenModels.filter(function (model) {
-    return !knownIds.has(model.id);
-  }));
+  return provider.models || [];
 }
 
 function modelFor(providerKey, modelId) {
