@@ -1,58 +1,48 @@
 # OmniChat — Chat IA multi-modèles
 
-App 100% statique HTML/CSS/JS vanilla. Hébergeable sur GitHub Pages. Aucun back-end, aucun build, aucun compte.
+Application 100 % statique en HTML, CSS et JavaScript vanilla. Elle ne demande ni compte OmniChat, ni build, ni serveur : elle est prévue pour GitHub Pages.
 
-## Déploiement GitHub Pages
+Les clés API, conversations, réglages et préférence de thème sont conservés uniquement dans le `localStorage` du navigateur. Une clé n’est envoyée qu’au fournisseur sélectionné.
 
-1. Push ces fichiers dans un dépôt GitHub
-2. Settings → Pages → Source: `main` + root `/`
-3. Dispo sur `https://<user>.github.io/<repo>/`
+## Déploiement sur GitHub Pages
 
-Ou déploie direct avec `npx gh-pages -d .`
+1. Place `index.html`, `styles.css`, `app.js` et ce fichier à la racine de la branche `main`.
+2. Dans **Settings → Pages**, choisis **Deploy from a branch**.
+3. Sélectionne la branche **main**, puis le dossier **/(root)**, et enregistre.
+4. Attends la publication sur `https://<utilisateur>.github.io/<dépôt>/`.
+
+Les liens locaux sont relatifs (`./styles.css` et `./app.js`) : l’application fonctionne donc aussi depuis un dépôt servi sous un sous-dossier, comme `/omnichat/`.
 
 ## Utilisation
 
-1. Ouvre l'app
-2. Clique ⚙️ Paramètres
-3. Colle ta clé API pour le fournisseur voulu (OpenAI, Anthropic, etc.)
-4. Choisis fournisseur + modèle dans l'en-tête
-5. Écris un message et envoie (Entrée ou Ctrl+Entrée)
+1. Ouvre l’application et clique sur **Paramètres**.
+2. Colle une clé pour le fournisseur voulu, puis enregistre.
+3. Choisis le fournisseur et le modèle dans l’en-tête.
+4. Écris un message.
 
-**Tes clés restent dans ton navigateur** (localStorage). Jamais transmises ailleurs qu'à l'API choisie.
+`Ctrl`/`Cmd` + `Entrée` envoie le message. `Maj` + `Entrée` ajoute une ligne et `Échap` annule une édition. Sur mobile, utilise le bouton menu pour ouvrir les conversations.
 
-## Fournisseurs supportés
+## Fournisseurs
 
-| Fournisseur | Clé API | CORS navigateur |
-|---|---|---|
-| OpenAI | platform.openai.com/api-keys | ✅ |
-| Anthropic | console.anthropic.com/settings/keys | ✅ |
-| Google Gemini | aistudio.google.com/app/apikey | ✅ (clé dans URL) |
-| xAI | console.x.ai | ✅ |
-| DeepSeek | platform.deepseek.com | ✅ |
-| Alibaba Qwen | bailian.console.aliyun.com | ✅ |
-| Moonshot | platform.moonshot.cn | ✅ |
-| OpenRouter | openrouter.ai/keys | ✅ |
-| OpenCode Zen | opencode.ai/docs/zen | ✅ |
+La configuration éditable se trouve au début de [`app.js`](app.js). Les identifiants de modèles et URLs y sont regroupés par fournisseur.
 
-## Proxy CORS
+- OpenAI, Anthropic et Google Gemini disposent de leurs adaptateurs natifs de streaming.
+- xAI, DeepSeek, Qwen, Moonshot et OpenRouter utilisent le format OpenAI-compatible.
+- OpenRouter accepte aussi un identifiant de modèle libre.
+- OpenCode Zen utilise `opencode/<model-id>` et affiche par défaut ses modèles gratuits compatibles avec `chat/completions`. Les autres familles Zen (GPT, Claude, Gemini et Qwen) emploient d’autres endpoints et sont donc filtrées pour éviter une requête invalide.
 
-Si un fournisseur bloque l'appel navigateur direct, ajoute une base URL proxy dans les Paramètres.
+Un navigateur ne peut pas contourner le CORS d’un fournisseur. Si une API refuse les appels directs depuis GitHub Pages, OmniChat affiche une erreur exploitable ; la seule solution est que le fournisseur active CORS pour le site ou d’utiliser un proxy que tu contrôles. À ce jour, l’endpoint Zen ne répond pas aux prérequis CORS des appels directs depuis GitHub Pages.
 
 ## Fichiers
 
-- `index.html` — Structure HTML
-- `styles.css` — Design tokens, layout, composants
-- `app.js` — Logique complète (config, state, adaptateurs API, UI)
-- `README.md` — Ce fichier
-
-## Personnalisation
-
-Édite `app.js` → objet `PROVIDERS` en haut du fichier pour ajouter/modifier fournisseurs et modèles.
+- `index.html` — structure sémantique et accessibilité
+- `styles.css` — design tokens, mise en page responsive et thèmes
+- `app.js` — état local, interfaces, adaptateurs API et streaming SSE
+- `README.md` — installation et limites connues
 
 ## Stack
 
-- HTML5 sémantique + CSS moderne (variables, flexbox, grid)
-- JS vanilla (ES modules via defer)
-- CDN : marked (Markdown GFM), highlight.js (coloration), DOMPurify (sanitize)
-- Stockage : localStorage (clés, conversations, réglages)
-- Accessibilité : WCAG 2.2 AA (aria-live, focus visible, contraste, clavier)
+- HTML5 sémantique, CSS moderne, JavaScript ES modules
+- CDN : marked, highlight.js et DOMPurify
+- `localStorage` pour les données locales
+- Markdown nettoyé, coloration de code, streaming, annulation, régénération et thème clair/sombre

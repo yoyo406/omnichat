@@ -1,18 +1,20 @@
-/* ===== CONFIGURATION ===== */
+/* OmniChat: configuration kept deliberately at the top for easy editing. */
 const PROVIDERS = {
   openai: {
     name: 'OpenAI',
     adapter: 'openai',
     baseUrl: 'https://api.openai.com/v1',
     docsUrl: 'https://platform.openai.com/api-keys',
+    keyPlaceholder: 'sk-…',
     models: [
       { id: 'gpt-5.6-sol', name: 'GPT-5.6 Sol' },
       { id: 'gpt-5.6-terra', name: 'GPT-5.6 Terra' },
       { id: 'gpt-5.6-luna', name: 'GPT-5.6 Luna' },
+      { id: 'gpt-5.6', name: 'GPT-5.6' },
       { id: 'gpt-5.5', name: 'GPT-5.5' },
       { id: 'gpt-5.5-pro', name: 'GPT-5.5 Pro' },
       { id: 'gpt-5.4-mini', name: 'GPT-5.4 Mini' },
-      { id: 'gpt-4.1', name: 'GPT-4.1' },
+      { id: 'gpt-4.1', name: 'GPT-4.1' }
     ]
   },
   anthropic: {
@@ -20,12 +22,13 @@ const PROVIDERS = {
     adapter: 'anthropic',
     baseUrl: 'https://api.anthropic.com/v1',
     docsUrl: 'https://console.anthropic.com/settings/keys',
-    corsSupported: true,
+    keyPlaceholder: 'sk-ant-…',
     models: [
-      { id: 'claude-opus-4-8', name: 'Claude Opus 4-8' },
+      { id: 'claude-opus-5', name: 'Claude Opus 5' },
+      { id: 'claude-opus-4-8', name: 'Claude Opus 4.8' },
       { id: 'claude-sonnet-5', name: 'Claude Sonnet 5' },
-      { id: 'claude-opus-4-7', name: 'Claude Opus 4-7' },
-      { id: 'claude-haiku-4-5', name: 'Claude Haiku 4-5' },
+      { id: 'claude-opus-4-7', name: 'Claude Opus 4.7' },
+      { id: 'claude-haiku-4-5', name: 'Claude Haiku 4.5' }
     ]
   },
   gemini: {
@@ -33,11 +36,13 @@ const PROVIDERS = {
     adapter: 'gemini',
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
     docsUrl: 'https://aistudio.google.com/app/apikey',
+    keyPlaceholder: 'AIza…',
     models: [
       { id: 'gemini-3.6-flash', name: 'Gemini 3.6 Flash' },
       { id: 'gemini-3.5-flash-lite', name: 'Gemini 3.5 Flash Lite' },
+      { id: 'gemini-3.5-flash', name: 'Gemini 3.5 Flash' },
       { id: 'gemini-3.1-pro-preview', name: 'Gemini 3.1 Pro Preview' },
-      { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro' },
+      { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro' }
     ]
   },
   xai: {
@@ -45,8 +50,11 @@ const PROVIDERS = {
     adapter: 'openai',
     baseUrl: 'https://api.x.ai/v1',
     docsUrl: 'https://console.x.ai/',
+    keyPlaceholder: 'xai-…',
     models: [
       { id: 'grok-4.5', name: 'Grok 4.5' },
+      { id: 'grok-4.3', name: 'Grok 4.3' },
+      { id: 'grok-4.20-0309-reasoning', name: 'Grok 4.20 Reasoning' }
     ]
   },
   deepseek: {
@@ -54,9 +62,12 @@ const PROVIDERS = {
     adapter: 'openai',
     baseUrl: 'https://api.deepseek.com/v1',
     docsUrl: 'https://platform.deepseek.com/api_keys',
+    keyPlaceholder: 'sk-…',
     models: [
       { id: 'deepseek-v4-pro', name: 'DeepSeek V4 Pro' },
       { id: 'deepseek-v4-flash', name: 'DeepSeek V4 Flash' },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat' },
+      { id: 'deepseek-reasoner', name: 'DeepSeek Reasoner' }
     ]
   },
   qwen: {
@@ -64,19 +75,25 @@ const PROVIDERS = {
     adapter: 'openai',
     baseUrl: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
     docsUrl: 'https://bailian.console.aliyun.com/',
+    keyPlaceholder: 'sk-…',
     models: [
-      { id: 'qwen3.8-max-preview', name: 'Qwen 3.8 Max Preview' },
-      { id: 'qwen3.6-27b', name: 'Qwen 3.6 27B' },
+      { id: 'qwen3.7-max', name: 'Qwen 3.7 Max' },
+      { id: 'qwen3.7-plus', name: 'Qwen 3.7 Plus' },
+      { id: 'qwen3.6-flash', name: 'Qwen 3.6 Flash' },
+      { id: 'qwen3.5-plus', name: 'Qwen 3.5 Plus' }
     ]
   },
   moonshot: {
-    name: 'Moonshot',
+    name: 'Moonshot AI',
     adapter: 'openai',
-    baseUrl: 'https://api.moonshot.cn/v1',
-    docsUrl: 'https://platform.moonshot.cn/',
+    baseUrl: 'https://api.moonshot.ai/v1',
+    docsUrl: 'https://platform.moonshot.ai/docs/api/chat',
+    keyPlaceholder: 'sk-…',
     models: [
       { id: 'kimi-k3', name: 'Kimi K3' },
       { id: 'kimi-k2.6', name: 'Kimi K2.6' },
+      { id: 'kimi-k2.5', name: 'Kimi K2.5' },
+      { id: 'kimi-k2-thinking', name: 'Kimi K2 Thinking' }
     ]
   },
   openrouter: {
@@ -84,49 +101,55 @@ const PROVIDERS = {
     adapter: 'openai',
     baseUrl: 'https://openrouter.ai/api/v1',
     docsUrl: 'https://openrouter.ai/keys',
-    corsSupported: true,
+    keyPlaceholder: 'sk-or-…',
+    allowCustomModel: true,
     models: [
       { id: 'openai/gpt-5.6-sol', name: 'GPT-5.6 Sol' },
-      { id: 'openai/gpt-5.5-pro', name: 'GPT-5.5 Pro' },
-      { id: 'openai/gpt-4.1', name: 'GPT-4.1' },
-      { id: 'anthropic/claude-opus-4-8', name: 'Claude Opus 4-8' },
-      { id: 'anthropic/claude-sonnet-5', name: 'Claude Sonnet 5' },
-      { id: 'anthropic/claude-haiku-4-5', name: 'Claude Haiku 4-5' },
+      { id: 'anthropic/claude-opus-4.8', name: 'Claude Opus 4.8' },
       { id: 'google/gemini-3.6-flash', name: 'Gemini 3.6 Flash' },
-      { id: 'xai/grok-4.5', name: 'Grok 4.5' },
+      { id: 'x-ai/grok-4.5', name: 'Grok 4.5' },
       { id: 'deepseek/deepseek-v4-pro', name: 'DeepSeek V4 Pro' },
-      { id: 'qwen/qwen3.8-max-preview', name: 'Qwen 3.8 Max Preview' },
-      { id: 'moonshot/kimi-k3', name: 'Kimi K3' },
-    ],
-    allowCustomModel: true
+      { id: 'qwen/qwen3.7-max', name: 'Qwen 3.7 Max' },
+      { id: 'moonshotai/kimi-k3', name: 'Kimi K3' },
+      { id: 'openrouter/auto', name: 'Auto Router' }
+    ]
   },
   opencode: {
     name: 'OpenCode Zen',
     adapter: 'openai',
     baseUrl: 'https://opencode.ai/zen/v1',
     docsUrl: 'https://opencode.ai/docs/zen',
+    keyPlaceholder: '…',
+    allowCustomModel: true,
     models: [
-      { id: 'opencode/deepseek-v4-flash-free', name: 'DeepSeek V4 Flash (Gratuit)', free: true },
-      { id: 'opencode/big-pickle', name: 'Big Pickle (Gratuit)', free: true },
-      { id: 'opencode/mimo-v2.5-free', name: 'Mimo v2.5 (Gratuit)', free: true },
-      { id: 'opencode/laguna-s-2.1-free', name: 'Laguna S 2.1 (Gratuit)', free: true },
-      { id: 'opencode/north-mini-code-free', name: 'North Mini Code (Gratuit)', free: true },
-      { id: 'opencode/nemotron-3-ultra-free', name: 'Nemotron 3 Ultra (Gratuit)', free: true },
-      { id: 'opencode/claude-sonnet-4-5', name: 'Claude Sonnet 4-5' },
-      { id: 'opencode/deepseek-v4-pro', name: 'DeepSeek V4 Pro' },
-    ],
-    allowCustomModel: true
+      { id: 'opencode/big-pickle', name: 'Big Pickle', free: true },
+      { id: 'opencode/deepseek-v4-flash-free', name: 'DeepSeek V4 Flash', free: true },
+      { id: 'opencode/mimo-v2.5-free', name: 'MiMo V2.5', free: true },
+      { id: 'opencode/laguna-s-2.1-free', name: 'Laguna S 2.1', free: true },
+      { id: 'opencode/north-mini-code-free', name: 'North Mini Code', free: true },
+      { id: 'opencode/nemotron-3-ultra-free', name: 'Nemotron 3 Ultra', free: true }
+    ]
   }
 };
 
-const PROVIDER_KEYS = Object.keys(PROVIDERS);
+/* Zen exposes several API families. This app deliberately uses Chat Completions
+   for Zen, so these documented model families must not be sent to that route. */
+const ZEN_NON_CHAT_COMPLETIONS_PREFIXES = ['gpt-', 'claude-', 'gemini-', 'qwen'];
 
-const STORAGE_KEYS = {
+const PROVIDER_KEYS = Object.keys(PROVIDERS);
+const STORAGE = {
   apiKeys: 'omnichat_apiKeys',
   conversations: 'omnichat_conversations',
   settings: 'omnichat_settings',
-  activeConv: 'omnichat_activeConv',
-  theme: 'omnichat_theme',
+  activeConversation: 'omnichat_activeConv',
+  selection: 'omnichat_selection',
+  theme: 'omnichat_theme'
+};
+
+const DEFAULT_SETTINGS = {
+  temperature: 0.7,
+  maxTokens: 4096,
+  systemPrompt: 'Tu es un assistant IA utile, précis et concis.'
 };
 
 const SUGGESTED_PROMPTS = [
@@ -134,1335 +157,1620 @@ const SUGGESTED_PROMPTS = [
   'Écris un script Python pour analyser un fichier CSV',
   'Rédige un email professionnel de refus de candidature',
   'Donne-moi 5 idées de projets pour apprendre React',
-  'Traduis cette phrase en anglais courant',
-  'Résume les points clés du développement durable',
+  'Traduis cette phrase en anglais courant'
 ];
 
-const ERRORS = {
-  401: 'Clé API invalide pour ce fournisseur. Vérifie-la dans les Paramètres.',
-  403: 'Accès refusé. Vérifie ta clé API dans les Paramètres.',
-  404: 'Modèle introuvable. Vérifie le nom du modèle.',
+const ERROR_MESSAGES = {
+  400: 'La requête a été refusée. Vérifie le modèle et les paramètres choisis.',
+  401: 'Clé API invalide pour ce fournisseur. Vérifie-la dans les paramètres.',
+  403: 'Accès refusé. Vérifie les droits associés à cette clé API.',
+  404: 'Modèle ou point d’accès introuvable. Vérifie le modèle sélectionné.',
+  408: 'La requête a expiré. Réessaie.',
+  413: 'La conversation est trop volumineuse pour ce modèle. Démarre un nouveau chat ou raccourcis le contexte.',
   429: 'Limite de débit atteinte. Attends un moment puis réessaie.',
-  500: 'Erreur serveur. Réessaie plus tard.',
-  502: 'Service temporairement indisponible. Réessaie.',
-  503: 'Service indisponible. Réessaie plus tard.',
+  500: 'Erreur temporaire du fournisseur. Réessaie plus tard.',
+  502: 'Le fournisseur est momentanément indisponible. Réessaie.',
+  503: 'Le fournisseur est momentanément indisponible. Réessaie.',
+  504: 'Le fournisseur a mis trop de temps à répondre. Réessaie.'
 };
 
-/* ===== STATE ===== */
-let state = {
+const ICONS = {
+  copy: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+  check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>',
+  edit: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h10"/><path d="m15 4 5 5M12 17l1-4 7-7a2.1 2.1 0 0 0-3-3l-7 7-1 4Z"/></svg>',
+  refresh: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0 2 5.5"/><path d="M20 4v7h-7"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
+  external: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>',
+  eye: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></svg>',
+  eyeOff: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.9 5.2A11.8 11.8 0 0 1 12 5c6.5 0 10 7 10 7a18 18 0 0 1-3.1 3.8M6.1 6.1C3.5 7.8 2 12 2 12s3.5 7 10 7a10.8 10.8 0 0 0 3.1-.5"/></svg>',
+  download: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 20h16"/></svg>'
+};
+
+const state = {
   conversations: [],
-  activeConvId: null,
-  settings: {
-    temperature: 0.7,
-    maxTokens: 4096,
-    systemPrompt: 'Tu es un assistant IA utile, précis et concis.',
-  },
+  activeConversationId: null,
   apiKeys: {},
-  theme: null, // 'light' | 'dark' | null (auto)
+  settings: Object.assign({}, DEFAULT_SETTINGS),
   selectedProvider: 'openai',
   selectedModel: 'gpt-5.6-sol',
+  themePreference: 'system',
+  zenModels: [],
   streaming: false,
+  streamingMessageId: null,
   abortController: null,
+  requestNumber: 0,
   editingMessageId: null,
+  followOutput: true
 };
 
-function loadState() {
+let pendingAssistantRender = null;
+let assistantRenderQueued = false;
+let lastFocusedElement = null;
+let settingsFocusProvider = null;
+
+function byId(id) {
+  return document.getElementById(id);
+}
+
+function makeElement(tagName, className, text) {
+  const element = document.createElement(tagName);
+  if (className) element.className = className;
+  if (text !== undefined && text !== null) element.textContent = text;
+  return element;
+}
+
+function makeIcon(name) {
+  const template = document.createElement('template');
+  template.innerHTML = ICONS[name] || '';
+  const svg = template.content.firstElementChild;
+  if (svg) {
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('stroke-width', '2');
+    svg.setAttribute('stroke-linecap', 'round');
+    svg.setAttribute('stroke-linejoin', 'round');
+  }
+  return svg;
+}
+
+function makeActionButton(label, iconName, onClick, extraClass) {
+  const button = makeElement('button', extraClass || 'msg-action-btn');
+  button.type = 'button';
+  button.setAttribute('aria-label', label);
+  button.title = label;
+  const icon = makeIcon(iconName);
+  if (icon) button.append(icon);
+  button.addEventListener('click', onClick);
+  return button;
+}
+
+function readJson(key, fallback) {
   try {
-    const c = localStorage.getItem(STORAGE_KEYS.conversations);
-    if (c) state.conversations = JSON.parse(c);
-    const a = localStorage.getItem(STORAGE_KEYS.activeConv);
-    if (a) state.activeConvId = a;
-    const s = localStorage.getItem(STORAGE_KEYS.settings);
-    if (s) state.settings = { ...state.settings, ...JSON.parse(s) };
-    const k = localStorage.getItem(STORAGE_KEYS.apiKeys);
-    if (k) state.apiKeys = JSON.parse(k);
-    const t = localStorage.getItem(STORAGE_KEYS.theme);
-    if (t) state.theme = t;
-  } catch (e) { console.warn('State load error', e); }
-}
-
-function saveConversations() {
-  localStorage.setItem(STORAGE_KEYS.conversations, JSON.stringify(state.conversations));
-}
-
-function saveSettings() {
-  localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(state.settings));
-}
-
-function saveApiKeys() {
-  localStorage.setItem(STORAGE_KEYS.apiKeys, JSON.stringify(state.apiKeys));
-}
-
-function saveActiveConv() {
-  if (state.activeConvId) {
-    localStorage.setItem(STORAGE_KEYS.activeConv, state.activeConvId);
-  } else {
-    localStorage.removeItem(STORAGE_KEYS.activeConv);
+    const value = localStorage.getItem(key);
+    return value === null ? fallback : JSON.parse(value);
+  } catch (error) {
+    console.warn('Impossible de lire le stockage local.', error);
+    return fallback;
   }
 }
 
-function saveTheme() {
-  if (state.theme) {
-    localStorage.setItem(STORAGE_KEYS.theme, state.theme);
+function writeJson(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch (error) {
+    console.error('Impossible d’écrire dans le stockage local.', error);
+    announce('Impossible d’enregistrer localement. Vérifie l’espace disponible dans le navigateur.');
+    return false;
+  }
+}
+
+function clamp(value, minimum, maximum, fallback) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return fallback;
+  return Math.min(maximum, Math.max(minimum, number));
+}
+
+function generateId() {
+  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+    return window.crypto.randomUUID();
+  }
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+
+function knownProvider(providerKey) {
+  return Object.prototype.hasOwnProperty.call(PROVIDERS, providerKey);
+}
+
+function zenSupportsChatCompletions(modelId) {
+  const bareId = String(modelId || '').replace(/^opencode\//, '');
+  return !ZEN_NON_CHAT_COMPLETIONS_PREFIXES.some(function (prefix) {
+    return bareId.indexOf(prefix) === 0;
+  });
+}
+
+function modelsFor(providerKey) {
+  const provider = PROVIDERS[providerKey];
+  if (!provider) return [];
+  const staticModels = provider.models || [];
+  if (providerKey !== 'opencode' || state.zenModels.length === 0) return staticModels;
+
+  const knownIds = new Set(staticModels.map(function (model) { return model.id; }));
+  return staticModels.concat(state.zenModels.filter(function (model) {
+    return !knownIds.has(model.id);
+  }));
+}
+
+function modelFor(providerKey, modelId) {
+  return modelsFor(providerKey).find(function (model) {
+    return model.id === modelId;
+  }) || { id: modelId, name: modelId, custom: true };
+}
+
+function firstModelId(providerKey) {
+  const first = modelsFor(providerKey)[0];
+  return first ? first.id : '';
+}
+
+function formatModelLabel(providerKey, modelId) {
+  const provider = PROVIDERS[providerKey];
+  const model = modelFor(providerKey, modelId);
+  if (!provider) return modelId || 'Modèle inconnu';
+  return provider.name + ' · ' + model.name + (model.free ? ' · Gratuit' : '');
+}
+
+function formatTime(timestamp) {
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function formatRelativeDate(timestamp) {
+  const date = new Date(timestamp);
+  const difference = Date.now() - date.getTime();
+  if (!Number.isFinite(difference) || difference < 60000) return 'À l’instant';
+  if (difference < 3600000) return Math.floor(difference / 60000) + ' min';
+  if (difference < 86400000) return Math.floor(difference / 3600000) + ' h';
+  if (difference < 604800000) return Math.floor(difference / 86400000) + ' j';
+  return date.toLocaleDateString([], { day: 'numeric', month: 'short' });
+}
+
+function conversationTitle(conversation) {
+  if (conversation.title && conversation.title !== 'Nouveau chat') return conversation.title;
+  const firstMessage = conversation.messages.find(function (message) {
+    return message.role === 'user' && message.content;
+  });
+  if (!firstMessage) return 'Nouveau chat';
+  const compact = firstMessage.content.replace(/\s+/g, ' ').trim();
+  return compact.length > 54 ? compact.slice(0, 54) + '…' : compact;
+}
+
+function normaliseMessage(message) {
+  if (!message || (message.role !== 'user' && message.role !== 'assistant')) return null;
+  return {
+    id: typeof message.id === 'string' ? message.id : generateId(),
+    role: message.role,
+    content: typeof message.content === 'string' ? message.content : '',
+    createdAt: Number.isFinite(Number(message.createdAt)) ? Number(message.createdAt) : Date.now(),
+    providerKey: knownProvider(message.providerKey) ? message.providerKey : null,
+    modelId: typeof message.modelId === 'string' ? message.modelId : null,
+    modelLabel: typeof message.model === 'string' ? message.model : null,
+    free: Boolean(message.free),
+    isError: Boolean(message.isError),
+    stopped: Boolean(message.stopped)
+  };
+}
+
+function normaliseConversation(conversation) {
+  if (!conversation || typeof conversation !== 'object') return null;
+  const providerKey = knownProvider(conversation.provider) ? conversation.provider : 'openai';
+  const fallbackModel = firstModelId(providerKey);
+  const modelId = typeof conversation.model === 'string' && conversation.model ? conversation.model : fallbackModel;
+  const messages = Array.isArray(conversation.messages) ? conversation.messages.map(normaliseMessage).filter(Boolean) : [];
+  return {
+    id: typeof conversation.id === 'string' ? conversation.id : generateId(),
+    title: typeof conversation.title === 'string' && conversation.title ? conversation.title : 'Nouveau chat',
+    messages: messages,
+    createdAt: Number.isFinite(Number(conversation.createdAt)) ? Number(conversation.createdAt) : Date.now(),
+    updatedAt: Number.isFinite(Number(conversation.updatedAt)) ? Number(conversation.updatedAt) : Date.now(),
+    provider: providerKey,
+    model: modelId
+  };
+}
+
+function loadState() {
+  const storedConversations = readJson(STORAGE.conversations, []);
+  state.conversations = Array.isArray(storedConversations) ? storedConversations.map(normaliseConversation).filter(Boolean) : [];
+  state.conversations.sort(function (a, b) { return b.updatedAt - a.updatedAt; });
+
+  const storedKeys = readJson(STORAGE.apiKeys, {});
+  if (storedKeys && typeof storedKeys === 'object') {
+    PROVIDER_KEYS.forEach(function (providerKey) {
+      if (typeof storedKeys[providerKey] === 'string' && storedKeys[providerKey].trim()) {
+        state.apiKeys[providerKey] = storedKeys[providerKey].trim();
+      }
+    });
+  }
+
+  const storedSettings = readJson(STORAGE.settings, {});
+  state.settings.temperature = clamp(storedSettings.temperature, 0, 2, DEFAULT_SETTINGS.temperature);
+  state.settings.maxTokens = Math.round(clamp(storedSettings.maxTokens, 1, 128000, DEFAULT_SETTINGS.maxTokens));
+  state.settings.systemPrompt = typeof storedSettings.systemPrompt === 'string' ? storedSettings.systemPrompt : DEFAULT_SETTINGS.systemPrompt;
+
+  const storedSelection = readJson(STORAGE.selection, {});
+  const legacyActive = localStorage.getItem(STORAGE.activeConversation);
+  const activeId = typeof legacyActive === 'string' ? legacyActive : null;
+  state.activeConversationId = state.conversations.some(function (conversation) {
+    return conversation.id === activeId;
+  }) ? activeId : (state.conversations[0] ? state.conversations[0].id : null);
+
+  const activeConversation = getActiveConversation();
+  const requestedProvider = knownProvider(storedSelection.provider) ? storedSelection.provider : (activeConversation ? activeConversation.provider : 'openai');
+  state.selectedProvider = requestedProvider;
+  const requestedModel = typeof storedSelection.model === 'string' ? storedSelection.model : (activeConversation ? activeConversation.model : firstModelId(requestedProvider));
+  state.selectedModel = requestedModel || firstModelId(requestedProvider);
+
+  const savedTheme = localStorage.getItem(STORAGE.theme);
+  state.themePreference = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'system';
+}
+
+function saveConversations() {
+  writeJson(STORAGE.conversations, state.conversations);
+}
+
+function saveApiKeys() {
+  writeJson(STORAGE.apiKeys, state.apiKeys);
+}
+
+function saveSettings() {
+  writeJson(STORAGE.settings, state.settings);
+}
+
+function saveSelection() {
+  writeJson(STORAGE.selection, {
+    provider: state.selectedProvider,
+    model: state.selectedModel
+  });
+  if (state.activeConversationId) {
+    localStorage.setItem(STORAGE.activeConversation, state.activeConversationId);
   } else {
-    localStorage.removeItem(STORAGE_KEYS.theme);
+    localStorage.removeItem(STORAGE.activeConversation);
   }
 }
 
 function getActiveConversation() {
-  return state.conversations.find(c => c.id === state.activeConvId) || null;
+  return state.conversations.find(function (conversation) {
+    return conversation.id === state.activeConversationId;
+  }) || null;
 }
 
-function generateId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-}
-
-function formatTime(ts) {
-  const d = new Date(ts);
-  const now = new Date();
-  const sameDay = d.toDateString() === now.toDateString();
-  if (sameDay) {
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
-  return d.toLocaleDateString([], { day: 'numeric', month: 'short' }) + ' ' +
-         d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-
-function formatDate(ts) {
-  const d = new Date(ts);
-  const now = new Date();
-  const diff = now - d;
-  if (diff < 60000) return 'À l\'instant';
-  if (diff < 3600000) return Math.floor(diff/60000) + ' min';
-  if (diff < 86400000) return Math.floor(diff/3600000) + 'h';
-  if (diff < 604800000) return Math.floor(diff/86400000) + 'j';
-  return d.toLocaleDateString([], { day: 'numeric', month: 'short' });
-}
-
-/* ===== CONVERSATIONS ===== */
 function createConversation() {
-  const conv = {
+  const now = Date.now();
+  const conversation = {
     id: generateId(),
     title: 'Nouveau chat',
     messages: [],
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
+    createdAt: now,
+    updatedAt: now,
     provider: state.selectedProvider,
-    model: state.selectedModel,
+    model: state.selectedModel
   };
-  state.conversations.unshift(conv);
-  state.activeConvId = conv.id;
+  state.conversations.unshift(conversation);
+  state.activeConversationId = conversation.id;
   saveConversations();
-  saveActiveConv();
-  return conv;
+  saveSelection();
+  return conversation;
 }
 
-function deleteConversation(id) {
-  state.conversations = state.conversations.filter(c => c.id !== id);
-  if (state.activeConvId === id) {
-    state.activeConvId = state.conversations.length > 0 ? state.conversations[0].id : null;
-    if (!state.activeConvId) {
-      createConversation();
-    }
-  }
-  saveConversations();
-  saveActiveConv();
+function ensureActiveConversation() {
+  return getActiveConversation() || createConversation();
 }
 
-function renameConversation(id, title) {
-  const conv = state.conversations.find(c => c.id === id);
-  if (conv) {
-    conv.title = title.trim() || 'Sans titre';
-    conv.updatedAt = Date.now();
-    saveConversations();
-  }
+function touchConversation(conversation) {
+  conversation.updatedAt = Date.now();
+  state.conversations.sort(function (a, b) { return b.updatedAt - a.updatedAt; });
 }
 
-function updateConversationTimestamp(id) {
-  const conv = state.conversations.find(c => c.id === id);
-  if (conv) {
-    conv.updatedAt = Date.now();
-    saveConversations();
-  }
+function announce(message) {
+  const region = byId('liveRegion');
+  if (!region) return;
+  region.textContent = '';
+  window.setTimeout(function () {
+    region.textContent = message;
+  }, 20);
 }
 
-function sortConversations() {
-  state.conversations.sort((a, b) => b.updatedAt - a.updatedAt);
-  saveConversations();
-}
-
-function getConversationTitle(conv) {
-  if (conv.title && conv.title !== 'Nouveau chat') return conv.title;
-  const firstUserMsg = conv.messages.find(m => m.role === 'user');
-  if (firstUserMsg) {
-    const text = firstUserMsg.content.trim();
-    return text.length > 50 ? text.slice(0, 50) + '…' : text;
-  }
-  return 'Nouveau chat';
-}
-
-/* ===== ADAPTERS ===== */
-
-// --- OpenAI-compatible (OpenAI, OpenRouter, DeepSeek, Qwen, Moonshot, OpenCode Zen, xAI) ---
-async function sendOpenAI({ messages, model, signal, onToken, onError }) {
-  const provider = PROVIDERS[state.selectedProvider];
-  const baseUrl = state.settings.customBaseUrl || provider.baseUrl;
-  const apiKey = state.apiKeys[state.selectedProvider];
-
-  const body = {
-    model,
-    messages: messages.map(m => ({ role: m.role, content: m.content })),
-    temperature: state.settings.temperature,
-    max_tokens: Math.floor(state.settings.maxTokens),
-    stream: true,
-  };
-
-  const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${apiKey}`,
-  };
-  if (state.selectedProvider === 'openrouter') {
-    headers['HTTP-Referer'] = location.origin;
-    headers['X-Title'] = 'OmniChat';
-  }
-
-  const res = await fetch(`${baseUrl}/chat/completions`, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify(body),
-    signal,
-  });
-
-  if (!res.ok) {
-    const errText = await res.text().catch(() => '');
-    onError(res.status, errText);
-    return;
-  }
-
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split('\n');
-    buffer = lines.pop() || '';
-
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed || !trimmed.startsWith('data: ')) continue;
-      const data = trimmed.slice(6).trim();
-      if (data === '[DONE]') return;
-
-      try {
-        const json = JSON.parse(data);
-        const content = json.choices?.[0]?.delta?.content || '';
-        if (content) onToken(content);
-        if (json.choices?.[0]?.finish_reason) return;
-      } catch (e) {
-        // skip parse errors
-      }
-    }
-  }
-}
-
-// --- Anthropic ---
-async function sendAnthropic({ messages, model, signal, onToken, onError }) {
-  const apiKey = state.apiKeys['anthropic'];
-
-  // Convert messages to Anthropic format
-  const systemMessages = messages.filter(m => m.role === 'system');
-  const systemPrompt = systemMessages.map(m => m.content).join('\n');
-  const history = messages.filter(m => m.role !== 'system').map(m => ({
-    role: m.role === 'assistant' ? 'assistant' : 'user',
-    content: m.content,
-  }));
-
-  const body = {
-    model,
-    system: systemPrompt || undefined,
-    messages: history.length > 0 ? history : [{ role: 'user', content: 'Hello' }],
-    max_tokens: Math.floor(state.settings.maxTokens),
-    temperature: state.settings.temperature,
-    stream: true,
-  };
-
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
-    body: JSON.stringify(body),
-    signal,
-  });
-
-  if (!res.ok) {
-    const errText = await res.text().catch(() => '');
-    onError(res.status, errText);
-    return;
-  }
-
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split('\n');
-    buffer = lines.pop() || '';
-
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed || !trimmed.startsWith('data: ')) continue;
-      const data = trimmed.slice(6).trim();
-      if (!data) continue;
-
-      try {
-        const json = JSON.parse(data);
-        if (json.type === 'content_block_start' && json.content_block?.text) {
-          onToken(json.content_block.text);
-        }
-        if (json.type === 'content_block_delta' && json.delta?.text) {
-          onToken(json.delta.text);
-        }
-        if (json.type === 'message_stop' || json.type === 'message_delta') {
-          if (json.type === 'message_stop') return;
-          continue;
-        }
-      } catch (e) {
-        // skip parse errors
-      }
-    }
-  }
-}
-
-// --- Google Gemini ---
-async function sendGemini({ messages, model, signal, onToken, onError }) {
-  const apiKey = state.apiKeys['gemini'];
-
-  const systemMessages = messages.filter(m => m.role === 'system');
-  const systemPrompt = systemMessages.map(m => m.content).join('\n');
-  const history = messages.filter(m => m.role !== 'system');
-
-  const contents = history.map(m => ({
-    role: m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: m.content }],
-  }));
-
-  const body = {
-    systemInstruction: systemPrompt ? { parts: [{ text: systemPrompt }] } : undefined,
-    contents: contents.length > 0 ? contents : [{ role: 'user', parts: [{ text: 'Hello' }] }],
-    generationConfig: {
-      temperature: state.settings.temperature,
-      maxOutputTokens: Math.floor(state.settings.maxTokens),
-    },
-  };
-
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${apiKey}`;
-
-  // Clean undefined fields
-  if (!body.systemInstruction) delete body.systemInstruction;
-
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-    signal,
-  });
-
-  if (!res.ok) {
-    const errText = await res.text().catch(() => '');
-    onError(res.status, errText);
-    return;
-  }
-
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split('\n');
-    buffer = lines.pop() || '';
-
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed || !trimmed.startsWith('data: ')) continue;
-      const data = trimmed.slice(6).trim();
-
-      try {
-        const json = JSON.parse(data);
-        const text = json.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        if (text) onToken(text);
-      } catch (e) {
-        // skip
-      }
-    }
-  }
-}
-
-const ADAPTERS = {
-  openai: sendOpenAI,
-  anthropic: sendAnthropic,
-  gemini: sendGemini,
-};
-
-/* ===== SEND MESSAGE ===== */
-async function sendMessage(content) {
-  if (state.streaming) return;
-  if (!content || !content.trim()) return;
-
-  const provider = PROVIDERS[state.selectedProvider];
-  const apiKey = state.apiKeys[state.selectedProvider];
-  if (!apiKey) {
-    openSettings();
-    return;
-  }
-
-  state.editingMessageId = null;
-
-  let conv = getActiveConversation();
-  if (!conv) {
-    conv = createConversation();
-  }
-
-  // Add user message
-  const userMsg = { id: generateId(), role: 'user', content: content.trim(), createdAt: Date.now() };
-  conv.messages.push(userMsg);
-  conv.updatedAt = Date.now();
-  if (conv.title === 'Nouveau chat') {
-    conv.title = content.trim().slice(0, 50) + (content.trim().length > 50 ? '…' : '');
-  }
-  saveConversations();
-  sortConversations();
-
-  renderConversationList();
-  renderMessages();
-
-  // Prepare assistant message placeholder
-  const assistantMsg = { id: generateId(), role: 'assistant', content: '', createdAt: Date.now(), model: `${provider.name} · ${state.selectedModel}` };
-  conv.messages.push(assistantMsg);
-  saveConversations();
-
-  renderMessages();
-  scrollToBottom();
-
-  streamAssistantResponse(conv, assistantMsg);
-}
-
-function showError(conv, msg, text) {
-  msg.content = text;
-  msg.isError = true;
-  saveConversations();
-  const el = document.getElementById(`msg-${msg.id}`);
-  if (el) {
-    el.classList.remove('streaming');
-    el.classList.add('error');
-    const contentEl = el.querySelector('.msg-content');
-    if (contentEl) {
-      contentEl.textContent = text;
-    }
-    // Show retry button
-    const actions = el.querySelector('.msg-actions');
-    if (actions) {
-      const retryBtn = document.createElement('button');
-      retryBtn.className = 'msg-action-btn';
-      retryBtn.setAttribute('aria-label', 'Réessayer');
-      retryBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>';
-      retryBtn.addEventListener('click', () => regenerateLastMessage());
-      actions.prepend(retryBtn);
-    }
-  }
-}
-
-function regenerateLastMessage() {
-  const conv = getActiveConversation();
-  if (!conv || conv.messages.length < 2) return;
-
-  while (conv.messages.length > 0 && conv.messages[conv.messages.length - 1].role !== 'user') {
-    conv.messages.pop();
-  }
-  if (conv.messages.length === 0) return;
-
-  saveConversations();
-  renderMessages();
-
-  const provider = PROVIDERS[state.selectedProvider];
-  const assistantMsg = {
-    id: generateId(),
-    role: 'assistant',
-    content: '',
-    createdAt: Date.now(),
-    model: `${provider.name} \u00b7 ${state.selectedModel}`
-  };
-  conv.messages.push(assistantMsg);
-  saveConversations();
-  renderMessages();
-  scrollToBottom();
-
-  streamAssistantResponse(conv, assistantMsg);
-}
-
-async function streamAssistantResponse(conv, assistantMsg) {
-  // Capture current config at stream start
-  const provider = PROVIDERS[state.selectedProvider];
-  const currentModel = state.selectedModel;
-  const adapter = ADAPTERS[provider.adapter];
-  if (!adapter) {
-    showError(conv, assistantMsg, 'Adaptateur non trouvé pour ce fournisseur.');
-    return;
-  }
-
-  state.streaming = true;
-  state.abortController = new AbortController();
-  updateComposerState();
-
-  const apiMessages = [];
-  if (state.settings.systemPrompt) {
-    apiMessages.push({ role: 'system', content: state.settings.systemPrompt });
-  }
-  for (let i = 0; i < conv.messages.length - 1; i++) {
-    const m = conv.messages[i];
-    if (m.role === 'user' || m.role === 'assistant') {
-      apiMessages.push({ role: m.role, content: m.content });
-    }
-  }
-
-  const msgEl = document.getElementById(`msg-${assistantMsg.id}`);
-  const contentEl = msgEl?.querySelector('.msg-content');
-
-  try {
-    let hasError = false;
-    await adapter({
-      messages: apiMessages,
-      model: currentModel,
-      signal: state.abortController.signal,
-      onToken: (token) => {
-        if (hasError) return;
-        assistantMsg.content += token;
-        if (contentEl) {
-          renderMessageContent(contentEl, assistantMsg.content);
-          const liveRegion = document.getElementById('liveRegion');
-          if (liveRegion) liveRegion.textContent = assistantMsg.content.slice(-200);
-        }
-        saveConversations();
-      },
-      onError: (status, body) => {
-        hasError = true;
-        const errMsg = ERRORS[status] || `Erreur ${status}: ${body || 'Réponse inconnue'}`;
-        showError(conv, assistantMsg, errMsg);
-      },
-    });
-    if (!hasError) {
-      const w = document.getElementById(`msg-${assistantMsg.id}`);
-      if (w) w.classList.remove('streaming');
-    }
-  } catch (err) {
-    if (err.name === 'AbortError') {
-      const w = document.getElementById(`msg-${assistantMsg.id}`);
-      if (w) w.classList.remove('streaming');
-      assistantMsg.content += '\n\n*[Génération interrompue]*';
-      if (contentEl) renderMessageContent(contentEl, assistantMsg.content);
-      saveConversations();
-    } else {
-      console.error('Stream error:', err);
-      showError(conv, assistantMsg, 'Erreur de connexion. Vérifie ta connexion Internet ou réessaie.');
-    }
-  }
-
-  state.streaming = false;
-  state.abortController = null;
-  updateComposerState();
-  renderConversationList();
-}
-
-function editAndResend(msgId) {
-  const conv = getActiveConversation();
-  if (!conv) return;
-
-  const msg = conv.messages.find(m => m.id === msgId);
-  if (!msg || msg.role !== 'user') return;
-
-  // Remove this message and all after it
-  const idx = conv.messages.indexOf(msg);
-  conv.messages = conv.messages.slice(0, idx);
-  conv.updatedAt = Date.now();
-  saveConversations();
-  sortConversations();
-  renderConversationList();
-  renderMessages();
-
-  // Set textarea
-  const textarea = document.getElementById('composerTextarea');
-  textarea.value = msg.content;
-  textarea.focus();
-  autoResizeTextarea(textarea);
-}
-
-/* ===== RENDER MESSAGES ===== */
-function renderMessages() {
-  const container = document.getElementById('messagesInner');
-  const conv = getActiveConversation();
-
-  if (!conv || conv.messages.length === 0) {
-    container.innerHTML = renderEmptyState();
-    return;
-  }
-
-  let html = '';
-  for (const msg of conv.messages) {
-    const isUser = msg.role === 'user';
-    const isError = msg.isError;
-    const isStreaming = msg.role === 'assistant' && msg === conv.messages[conv.messages.length - 1] && state.streaming && !msg.content;
-
-    const classes = [
-      'message',
-      isUser ? 'user' : (isError ? 'error' : 'assistant'),
-      isStreaming ? 'streaming' : '',
-    ].filter(Boolean).join(' ');
-
-    html += `<div class="${classes}" id="msg-${msg.id}" role="listitem">`;
-    html += `<div class="msg-content">${renderMarkdown(msg.content || '')}</div>`;
-    html += `<div class="msg-meta">`;
-    html += `<span class="msg-time">${formatTime(msg.createdAt)}</span>`;
-    if (msg.model && !isUser) {
-      html += `<span class="msg-model">${escapeHtml(msg.model)}</span>`;
-    }
-    if (msg.free) {
-      html += `<span class="msg-model" style="color:var(--success)">Gratuit</span>`;
-    }
-    html += `<span class="msg-actions">`;
-    if (isUser) {
-      html += `<button class="msg-action-btn" onclick="window.__editResend('${msg.id}')" aria-label="Éditer et renvoyer" title="Éditer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`;
-    } else if (!isError) {
-      html += `<button class="msg-action-btn" onclick="window.__regenerate('${msg.id}')" aria-label="Régénérer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>`;
-    }
-    const encContent = encodeURIComponent(msg.content);
-    html += `<button class="msg-action-btn" onclick="(function(){var t=decodeURIComponent('${encContent}');navigator.clipboard.writeText(t)})()" aria-label="Copier"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>`;
-    if (isError) {
-      html += `<button class="msg-action-btn" onclick="window.__regenerate()" aria-label="Réessayer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>`;
-    }
-    html += `</span>`;
-    html += `</div>`;
-    html += `</div>`;
-  }
-
-  container.innerHTML = html;
-
-  // Re-render code blocks with highlight.js
-  container.querySelectorAll('pre code').forEach(block => {
-    if (typeof hljs !== 'undefined') {
-      hljs.highlightElement(block);
-    }
-  });
-
-  // Add copy buttons
-  container.querySelectorAll('.code-header .copy-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const code = btn.closest('pre')?.querySelector('code')?.textContent || '';
-      navigator.clipboard.writeText(code).then(() => {
-        btn.classList.add('copied');
-        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg> Copié';
-        setTimeout(() => {
-          btn.classList.remove('copied');
-          const lang = btn.dataset.lang || 'code';
-          btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copier`;
-        }, 2000);
-      });
-    });
-  });
-
-  updateScrollButton();
-}
-
-function renderMessageContent(el, content) {
-  el.innerHTML = renderMarkdown(content);
-  // Highlight code blocks
-  el.querySelectorAll('pre code').forEach(block => {
-    if (typeof hljs !== 'undefined') {
-      hljs.highlightElement(block);
-    }
-  });
-  // Wire copy buttons
-  el.querySelectorAll('.code-header .copy-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const code = btn.closest('pre')?.querySelector('code')?.textContent || '';
-      navigator.clipboard.writeText(code).then(() => {
-        btn.classList.add('copied');
-        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg> Copié';
-        setTimeout(() => {
-          btn.classList.remove('copied');
-          const lang = btn.dataset.lang || 'code';
-          btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copier`;
-        }, 2000);
-      });
-    });
-  });
-}
-
-function renderEmptyState() {
-  const hasKeys = Object.values(state.apiKeys).some(k => k && k.trim());
-  const setupMsg = hasKeys
-    ? ''
-    : '<div class="setup-link"><button onclick="openSettings()">Ajouter une clé API dans les Paramètres</button></div>';
-
-  const prompts = SUGGESTED_PROMPTS.map(p =>
-    `<button onclick="useSuggestedPrompt(this)" data-prompt="${escapeHtml(p)}">${escapeHtml(p)}</button>`
-  ).join('');
-
-  return `
-    <div class="empty-state">
-      <div class="empty-state-icon">💬</div>
-      <h2>Bienvenue sur OmniChat</h2>
-      <p>Chat avec plusieurs modèles d'IA depuis ton navigateur. Tes clés API restent sur ton appareil.</p>
-      ${!hasKeys ? '<p style="font-weight:500;color:var(--accent)">Ajoute une clé API pour commencer.</p>' : ''}
-      <div class="suggested-prompts">${prompts}</div>
-      ${setupMsg}
-    </div>`;
-}
-
-function renderMarkdown(text) {
-  if (!text) return '';
-  let html;
-  try {
-    if (typeof marked !== 'undefined') {
-      html = marked.parse(text, { breaks: true, gfm: true });
-    } else {
-      html = text.replace(/\n/g, '<br>');
-    }
-  } catch (e) {
-    html = text.replace(/\n/g, '<br>');
-  }
-
-  // Sanitize
-  try {
-    if (typeof DOMPurify !== 'undefined') {
-      html = DOMPurify.sanitize(html, { ADD_ATTR: ['target'] });
-    }
-  } catch (e) {}
-
-  // Enhance code blocks with header
-  html = html.replace(/<pre><code class="language-(\w+)">/g, (match, lang) => {
-    const icon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
-    return `<pre><div class="code-header"><span class="code-lang">${escapeHtml(lang)}</span><button class="copy-btn" data-lang="${escapeHtml(lang)}">${icon} Copier</button></div><code class="language-${escapeHtml(lang)}">`;
-  });
-  html = html.replace(/<pre><code>/g, () => {
-    const icon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
-    return `<pre><div class="code-header"><span class="code-lang">code</span><button class="copy-btn" data-lang="code">${icon} Copier</button></div><code>`;
-  });
-
-  return html;
-}
-
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-/* ===== RENDER CONVERSATION LIST ===== */
-function renderConversationList(searchTerm) {
-  const list = document.getElementById('conversationList');
-  const term = (searchTerm || '').toLowerCase().trim();
-
-  let convs = [...state.conversations];
-  if (term) {
-    convs = convs.filter(c => {
-      const title = getConversationTitle(c).toLowerCase();
-      return title.includes(term);
-    });
-  }
-
-  if (convs.length === 0) {
-    list.innerHTML = `<div style="padding:16px;text-align:center;color:var(--text-tertiary);font-size:13px">${term ? 'Aucune conversation trouvée' : 'Aucune conversation'}</div>`;
-    return;
-  }
-
-  let html = '';
-  for (const conv of convs) {
-    const active = conv.id === state.activeConvId ? 'active' : '';
-    const title = getConversationTitle(conv);
-    html += `
-      <div class="conversation-item ${active}" data-id="${conv.id}" role="option" aria-selected="${active ? 'true' : 'false'}" tabindex="0">
-        <span class="conv-title">${escapeHtml(title)}</span>
-        <span class="conv-date">${formatDate(conv.updatedAt)}</span>
-        <span class="conv-actions">
-          <button class="conv-action-btn" data-action="rename" aria-label="Renommer" title="Renommer">✏️</button>
-          <button class="conv-action-btn" data-action="delete" aria-label="Supprimer" title="Supprimer">🗑️</button>
-        </span>
-      </div>`;
-  }
-  list.innerHTML = html;
-}
-
-/* ===== MODEL SELECTOR ===== */
-function populateModelSelector() {
-  const providerSelect = document.getElementById('providerSelect');
-  const modelSelect = document.getElementById('modelSelect');
-
-  providerSelect.innerHTML = '';
-  for (const [key, provider] of Object.entries(PROVIDERS)) {
-    const opt = document.createElement('option');
-    opt.value = key;
-    opt.textContent = provider.name;
-    if (key === state.selectedProvider) opt.selected = true;
-    providerSelect.appendChild(opt);
-  }
-
-  updateModelSelector();
-}
-
-function updateModelSelector() {
-  const provider = PROVIDERS[state.selectedProvider];
-  const modelSelect = document.getElementById('modelSelect');
-  modelSelect.innerHTML = '';
-
-  if (provider.allowCustomModel) {
-    // Add predefined options
-    for (const m of provider.models) {
-      const opt = document.createElement('option');
-      opt.value = m.id;
-      opt.textContent = m.free ? `${m.name}` : m.name;
-      if (m.id === state.selectedModel) opt.selected = true;
-      modelSelect.appendChild(opt);
-    }
-    // Add custom option at end
-    const customOpt = document.createElement('option');
-    customOpt.value = '__custom__';
-    customOpt.textContent = 'Personnalisé…';
-    modelSelect.appendChild(customOpt);
-    // If current model isn't in our list, add it
-    if (!provider.models.some(m => m.id === state.selectedModel)) {
-      const currentOpt = document.createElement('option');
-      currentOpt.value = state.selectedModel;
-      currentOpt.textContent = state.selectedModel;
-      currentOpt.selected = true;
-      modelSelect.insertBefore(currentOpt, customOpt);
-    }
-  } else {
-    for (const m of provider.models) {
-      const opt = document.createElement('option');
-      opt.value = m.id;
-      opt.textContent = m.free ? `${m.name} (Gratuit)` : m.name;
-      if (m.id === state.selectedModel) opt.selected = true;
-      modelSelect.appendChild(opt);
-    }
-  }
-
-  updateModelDisplayName();
-}
-
-function updateModelDisplayName() {
-  const provider = PROVIDERS[state.selectedProvider];
-  const display = document.getElementById('modelDisplayName');
-  if (provider) {
-    const model = provider.models.find(m => m.id === state.selectedModel);
-    if (model) {
-      display.textContent = `${provider.name} · ${model.name}`;
-      if (model.free) display.textContent += ' · Gratuit';
-    } else {
-      display.textContent = `${provider.name} · ${state.selectedModel}`;
-    }
-  }
-}
-
-/* ===== THEME ===== */
-function initTheme() {
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-  let theme = state.theme;
-  if (!theme) {
-    theme = prefersDark ? 'dark' : 'light';
-  }
-
-  applyTheme(theme);
-}
-
-function applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
-  state.theme = theme;
-  saveTheme();
-
-  const icon = document.getElementById('themeIcon');
-  if (theme === 'dark') {
-    icon.innerHTML = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
-  } else {
-    icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+function applyTheme() {
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const resolvedTheme = state.themePreference === 'system' ? (prefersDark ? 'dark' : 'light') : state.themePreference;
+  document.documentElement.setAttribute('data-theme', resolvedTheme);
+  const themeButton = byId('themeToggle');
+  const icon = byId('themeIcon');
+  if (themeButton) themeButton.setAttribute('aria-pressed', resolvedTheme === 'dark' ? 'true' : 'false');
+  if (icon) {
+    icon.innerHTML = resolvedTheme === 'dark'
+      ? '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>'
+      : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/>';
   }
 }
 
 function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme');
-  applyTheme(current === 'dark' ? 'light' : 'dark');
+  const resolvedTheme = document.documentElement.getAttribute('data-theme');
+  state.themePreference = resolvedTheme === 'dark' ? 'light' : 'dark';
+  localStorage.setItem(STORAGE.theme, state.themePreference);
+  applyTheme();
 }
 
-/* ===== SETTINGS MODAL ===== */
-function openSettings() {
-  const modal = document.getElementById('settingsModal');
-  const body = document.getElementById('settingsBody');
-
-  let html = '';
-
-  // API Keys
-  html += '<h3>Clés API</h3>';
-  html += '<p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px">Tes clés restent dans ton navigateur (localStorage). Jamais transmises ailleurs qu\'à l\'API choisie.</p>';
-
-  for (const [key, provider] of Object.entries(PROVIDERS)) {
-    const savedKey = state.apiKeys[key] || '';
-    const hasKey = savedKey ? 'has-key' : '';
-    const masked = savedKey ? savedKey.slice(0, 8) + '••••' + savedKey.slice(-4) : '';
-    html += `
-      <div class="settings-group">
-        <label for="apikey-${key}">${provider.name}</label>
-        <div class="api-key-field">
-          <input type="password" id="apikey-${key}" class="${hasKey}" value="${escapeHtml(savedKey)}" placeholder="sk-..." autocomplete="off" spellcheck="false">
-          <button class="api-key-toggle" id="toggle-${key}" aria-label="Afficher/masquer la clé" type="button">👁️</button>
-          ${provider.docsUrl ? `<a href="${provider.docsUrl}" target="_blank" rel="noopener" style="display:flex;align-items:center;width:44px;justify-content:center" aria-label="Obtenir une clé ${provider.name}">🔑</a>` : ''}
-        </div>
-      </div>`;
+function makeMarkdownHtml(text) {
+  const source = String(text || '');
+  if (!source) return '';
+  let html;
+  try {
+    if (window.marked && typeof window.marked.parse === 'function') {
+      html = window.marked.parse(source, { breaks: true, gfm: true });
+    } else {
+      html = source.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+    }
+  } catch (error) {
+    html = source.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
   }
 
-  // Parameters
-  html += '<h3>Paramètres du modèle</h3>';
-  html += `
-    <div class="settings-row">
-      <div class="settings-field">
-        <label for="settingsTemp">Temperature</label>
-        <input type="number" id="settingsTemp" min="0" max="2" step="0.1" value="${state.settings.temperature}">
-      </div>
-      <div class="settings-field">
-        <label for="settingsMaxTokens">Max tokens</label>
-        <input type="number" id="settingsMaxTokens" min="1" max="128000" step="1" value="${state.settings.maxTokens}">
-      </div>
-    </div>
-    <div class="settings-field">
-      <label for="settingsSystemPrompt">System prompt global</label>
-      <textarea id="settingsSystemPrompt" rows="3">${escapeHtml(state.settings.systemPrompt || '')}</textarea>
-    </div>
-    <div class="settings-field">
-      <label for="settingsCustomBaseUrl">Base URL personnalisée (proxy CORS)</label>
-      <input type="text" id="settingsCustomBaseUrl" placeholder="https://mon-proxy.example.com/v1" value="${escapeHtml(state.settings.customBaseUrl || '')}">
-    </div>
-  `;
-
-  body.innerHTML = html;
-
-  // Wire toggle password visibility
-  body.querySelectorAll('.api-key-toggle').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const input = btn.parentElement.querySelector('input');
-      input.type = input.type === 'password' ? 'text' : 'password';
-      btn.textContent = input.type === 'password' ? '👁️' : '👁️‍🗨️';
+  if (window.DOMPurify && typeof window.DOMPurify.sanitize === 'function') {
+    return window.DOMPurify.sanitize(html, {
+      ADD_ATTR: ['target', 'rel'],
+      USE_PROFILES: { html: true }
     });
+  }
+  return html;
+}
+
+function setCopiedState(button, label) {
+  const initialLabel = button.getAttribute('aria-label') || label;
+  button.classList.add('copied');
+  button.setAttribute('aria-label', 'Copié');
+  button.replaceChildren(makeIcon('check'));
+  window.setTimeout(function () {
+    if (!button.isConnected) return;
+    button.classList.remove('copied');
+    button.setAttribute('aria-label', initialLabel);
+    button.replaceChildren(makeIcon('copy'));
+  }, 2000);
+}
+
+async function copyText(text, button, label) {
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const fallback = document.createElement('textarea');
+      fallback.value = text;
+      fallback.setAttribute('readonly', '');
+      fallback.style.position = 'fixed';
+      fallback.style.opacity = '0';
+      document.body.append(fallback);
+      fallback.select();
+      const copied = document.execCommand('copy');
+      fallback.remove();
+      if (!copied) throw new Error('Copie indisponible');
+    }
+    setCopiedState(button, label);
+  } catch (error) {
+    announce('La copie a échoué. Sélectionne le texte puis copie-le manuellement.');
+  }
+}
+
+function renderRichContent(container, content) {
+  container.replaceChildren();
+  if (!content) {
+    if (state.streaming && container.closest('[data-message-id]') && container.closest('[data-message-id]').dataset.messageId === state.streamingMessageId) {
+      container.textContent = 'Réponse en cours…';
+    }
+    return;
+  }
+
+  const template = document.createElement('template');
+  template.innerHTML = makeMarkdownHtml(content);
+
+  template.content.querySelectorAll('a').forEach(function (link) {
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
   });
 
-  modal.classList.add('open');
-  modal.querySelector('.modal-close')?.focus();
-}
-
-function closeSettings() {
-  document.getElementById('settingsModal').classList.remove('open');
-}
-
-function saveSettingsFromModal() {
-  // Save API keys
-  for (const key of PROVIDER_KEYS) {
-    const input = document.getElementById(`apikey-${key}`);
-    if (input) {
-      const val = input.value.trim();
-      state.apiKeys[key] = val;
+  template.content.querySelectorAll('pre > code').forEach(function (code) {
+    const pre = code.parentElement;
+    if (!pre || !pre.parentNode) return;
+    const wrapper = makeElement('div', 'code-block');
+    const header = makeElement('div', 'code-header');
+    const className = Array.from(code.classList).find(function (name) {
+      return name.indexOf('language-') === 0;
+    });
+    const language = className ? className.slice('language-'.length) : 'code';
+    header.append(makeElement('span', 'code-lang', language));
+    const copyButton = makeActionButton('Copier le code', 'copy', function () {
+      copyText(code.textContent || '', copyButton, 'Copier le code');
+    }, 'copy-btn');
+    header.append(copyButton);
+    pre.parentNode.insertBefore(wrapper, pre);
+    wrapper.append(header, pre);
+    if (window.hljs && typeof window.hljs.highlightElement === 'function') {
+      try {
+        window.hljs.highlightElement(code);
+      } catch (error) {
+        console.warn('Coloration du code indisponible.', error);
+      }
     }
+  });
+
+  container.append(template.content);
+}
+
+function makeMessageMeta(message) {
+  const meta = makeElement('footer', 'msg-meta');
+  meta.append(makeElement('time', 'msg-time', formatTime(message.createdAt)));
+
+  if (message.role === 'assistant' && !message.isError) {
+    const label = message.modelLabel || formatModelLabel(message.providerKey || state.selectedProvider, message.modelId || state.selectedModel);
+    meta.append(makeElement('span', 'msg-model', label));
   }
-  saveApiKeys();
+  if (message.free) meta.append(makeElement('span', 'msg-free', 'Gratuit'));
+  if (message.stopped) meta.append(makeElement('span', 'msg-status', 'Interrompue'));
+  return meta;
+}
 
-  // Save settings
-  const temp = parseFloat(document.getElementById('settingsTemp')?.value);
-  const maxTokens = parseInt(document.getElementById('settingsMaxTokens')?.value);
-  const systemPrompt = document.getElementById('settingsSystemPrompt')?.value?.trim();
-  const customBaseUrl = document.getElementById('settingsCustomBaseUrl')?.value?.trim();
-
-  state.settings.temperature = isNaN(temp) ? 0.7 : temp;
-  state.settings.maxTokens = isNaN(maxTokens) ? 4096 : maxTokens;
-  state.settings.systemPrompt = systemPrompt || '';
-  state.settings.customBaseUrl = customBaseUrl || '';
-  saveSettings();
-
-  closeSettings();
-
-  // Update UI
+function beginEditing(messageId) {
+  if (state.streaming) return;
+  state.editingMessageId = messageId;
   renderMessages();
-  renderConversationList();
+  const editor = byId('edit-' + messageId);
+  if (editor) {
+    editor.focus();
+    editor.setSelectionRange(editor.value.length, editor.value.length);
+  }
 }
 
-function clearAllData() {
-  if (!confirm('Tout effacer ? Cette action supprime toutes les conversations, clés API et paramètres.')) return;
-
-  state.conversations = [];
-  state.apiKeys = {};
-  state.settings = { temperature: 0.7, maxTokens: 4096, systemPrompt: 'Tu es un assistant IA utile, précis et concis.' };
-  state.activeConvId = null;
-
-  localStorage.removeItem(STORAGE_KEYS.conversations);
-  localStorage.removeItem(STORAGE_KEYS.apiKeys);
-  localStorage.removeItem(STORAGE_KEYS.settings);
-  localStorage.removeItem(STORAGE_KEYS.activeConv);
-
-  closeSettings();
-  createConversation();
+function cancelEditing() {
+  if (!state.editingMessageId) return;
+  state.editingMessageId = null;
   renderMessages();
-  renderConversationList();
-  populateModelSelector();
-  updateComposerState();
 }
 
-/* ===== COMPOSER ===== */
-function autoResizeTextarea(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 200) + 'px';
+function resendEditedMessage(messageId, nextContent) {
+  const conversation = getActiveConversation();
+  if (!conversation || state.streaming || !nextContent.trim()) return;
+  const index = conversation.messages.findIndex(function (message) { return message.id === messageId; });
+  if (index < 0) return;
+  conversation.messages = conversation.messages.slice(0, index);
+  state.editingMessageId = null;
+  touchConversation(conversation);
+  saveConversations();
+  renderMessages();
+  sendMessage(nextContent);
 }
 
-function updateComposerState() {
-  const sendBtn = document.getElementById('sendBtn');
-  const stopBtn = document.getElementById('stopBtn');
-  const textarea = document.getElementById('composerTextarea');
-  const providerSelect = document.getElementById('providerSelect');
-  const modelSelect = document.getElementById('modelSelect');
+function makeEditBox(message) {
+  const editor = makeElement('div', 'message-edit');
+  const textarea = makeElement('textarea', 'message-edit-textarea');
+  textarea.id = 'edit-' + message.id;
+  textarea.value = message.content;
+  textarea.rows = Math.max(2, Math.min(8, message.content.split('\n').length + 1));
+  textarea.setAttribute('aria-label', 'Modifier votre message');
+  textarea.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      cancelEditing();
+    }
+    if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+      event.preventDefault();
+      resendEditedMessage(message.id, textarea.value);
+    }
+  });
+  const actions = makeElement('div', 'edit-actions');
+  const cancel = makeElement('button', 'btn btn-secondary', 'Annuler');
+  cancel.type = 'button';
+  cancel.addEventListener('click', cancelEditing);
+  const resend = makeElement('button', 'btn btn-primary', 'Enregistrer et renvoyer');
+  resend.type = 'button';
+  resend.addEventListener('click', function () {
+    resendEditedMessage(message.id, textarea.value);
+  });
+  actions.append(cancel, resend);
+  editor.append(textarea, actions);
+  return editor;
+}
 
-  if (state.streaming) {
-    sendBtn.style.display = 'none';
-    stopBtn.style.display = 'flex';
-    textarea.disabled = true;
-    providerSelect.disabled = true;
-    modelSelect.disabled = true;
+function createMessageElement(message) {
+  const article = makeElement('article', 'message');
+  article.id = 'message-' + message.id;
+  article.dataset.messageId = message.id;
+  article.setAttribute('role', 'listitem');
+  article.classList.add(message.role === 'user' ? 'user' : (message.isError ? 'error' : 'assistant'));
+  if (state.streaming && state.streamingMessageId === message.id) article.classList.add('streaming');
+
+  const body = makeElement('div', 'message-body');
+  const content = makeElement('div', 'msg-content');
+  content.dataset.messageContent = message.id;
+  if (state.editingMessageId === message.id && message.role === 'user') {
+    body.append(makeEditBox(message));
+  } else if (message.isError) {
+    content.textContent = message.content;
+    body.append(content);
   } else {
-    sendBtn.style.display = 'flex';
-    stopBtn.style.display = 'none';
-    textarea.disabled = false;
-    providerSelect.disabled = false;
-    modelSelect.disabled = false;
+    renderRichContent(content, message.content);
+    body.append(content);
   }
+  body.append(makeMessageMeta(message));
+
+  const actions = makeElement('div', 'msg-actions');
+  if (message.role === 'user' && state.editingMessageId !== message.id) {
+    actions.append(makeActionButton('Éditer et renvoyer', 'edit', function () {
+      beginEditing(message.id);
+    }));
+  }
+
+  actions.append(makeActionButton('Copier le message', 'copy', function (event) {
+    copyText(message.content, event.currentTarget, 'Copier le message');
+  }));
+
+  if (message.role === 'assistant' && !state.streaming) {
+    actions.append(makeActionButton(message.isError ? 'Réessayer' : 'Régénérer', 'refresh', function () {
+      retryAssistantMessage(message.id);
+    }));
+  }
+
+  body.append(actions);
+  article.append(body);
+  return article;
 }
 
-function useSuggestedPrompt(btn) {
-  const prompt = btn.dataset.prompt;
-  const textarea = document.getElementById('composerTextarea');
-  textarea.value = prompt;
-  autoResizeTextarea(textarea);
-  textarea.focus();
+function renderEmptyState() {
+  const container = byId('messagesInner');
+  const stateElement = makeElement('div', 'empty-state');
+  stateElement.append(makeElement('div', 'empty-state-icon', '✦'));
+  stateElement.append(makeElement('h2', '', 'Bienvenue sur OmniChat'));
+  stateElement.append(makeElement('p', '', 'Un seul espace pour utiliser plusieurs modèles d’IA. Tes clés API restent dans ce navigateur.'));
+
+  const hasKey = Object.keys(state.apiKeys).some(function (providerKey) {
+    return Boolean(state.apiKeys[providerKey]);
+  });
+  if (!hasKey) {
+    stateElement.append(makeElement('p', 'empty-state-note', 'Ajoute une clé API pour commencer.'));
+  }
+
+  const prompts = makeElement('div', 'suggested-prompts');
+  SUGGESTED_PROMPTS.forEach(function (prompt) {
+    const button = makeElement('button', '', prompt);
+    button.type = 'button';
+    button.addEventListener('click', function () {
+      const textarea = byId('composerTextarea');
+      textarea.value = prompt;
+      resizeTextarea();
+      textarea.focus();
+    });
+    prompts.append(button);
+  });
+  stateElement.append(prompts);
+
+  if (!hasKey) {
+    const setup = makeElement('div', 'setup-link');
+    const setupButton = makeElement('button', '', 'Ajouter une clé API dans les paramètres');
+    setupButton.type = 'button';
+    setupButton.addEventListener('click', function () { openSettings(state.selectedProvider); });
+    setup.append(setupButton);
+    stateElement.append(setup);
+  }
+  container.replaceChildren(stateElement);
 }
 
-/* ===== SCROLL ===== */
-function scrollToBottom() {
-  const container = document.getElementById('messagesContainer');
-  container.scrollTop = container.scrollHeight;
+function renderMessages() {
+  const container = byId('messagesInner');
+  const conversation = getActiveConversation();
+  if (!conversation || conversation.messages.length === 0) {
+    renderEmptyState();
+    updateScrollButton();
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  conversation.messages.forEach(function (message) {
+    fragment.append(createMessageElement(message));
+  });
+  container.replaceChildren(fragment);
+  updateScrollButton();
+}
+
+function queueAssistantRender(message) {
+  pendingAssistantRender = message;
+  if (assistantRenderQueued) return;
+  assistantRenderQueued = true;
+  window.requestAnimationFrame(function () {
+    assistantRenderQueued = false;
+    const pending = pendingAssistantRender;
+    pendingAssistantRender = null;
+    if (!pending) return;
+    const messageElement = byId('message-' + pending.id);
+    const content = messageElement ? messageElement.querySelector('[data-message-content]') : null;
+    if (content) renderRichContent(content, pending.content);
+    if (messageElement) messageElement.classList.add('streaming');
+    if (state.followOutput) scrollToBottom(false);
+    else updateScrollButton();
+  });
 }
 
 function isNearBottom() {
-  const container = document.getElementById('messagesContainer');
-  const threshold = 100;
-  return container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
+  const container = byId('messagesContainer');
+  if (!container) return true;
+  return container.scrollHeight - container.scrollTop - container.clientHeight < 96;
 }
 
 function updateScrollButton() {
-  const btn = document.getElementById('scrollBottomBtn');
-  if (isNearBottom() || state.streaming) {
-    btn.classList.remove('visible');
-  } else {
-    btn.classList.add('visible');
-  }
+  const button = byId('scrollBottomBtn');
+  if (!button) return;
+  button.hidden = isNearBottom();
 }
 
-/* ===== SIDEBAR ===== */
+function scrollToBottom(smooth) {
+  const container = byId('messagesContainer');
+  if (!container) return;
+  if (smooth && typeof container.scrollTo === 'function') {
+    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+  } else {
+    container.scrollTop = container.scrollHeight;
+  }
+  state.followOutput = true;
+  window.requestAnimationFrame(updateScrollButton);
+}
+
+function renderConversationList() {
+  const list = byId('conversationList');
+  const term = byId('searchConv').value.trim().toLocaleLowerCase();
+  const conversations = state.conversations.filter(function (conversation) {
+    return !term || conversationTitle(conversation).toLocaleLowerCase().includes(term);
+  });
+
+  list.replaceChildren();
+  if (conversations.length === 0) {
+    list.append(makeElement('li', 'conversation-empty', term ? 'Aucune conversation trouvée' : 'Aucune conversation'));
+    return;
+  }
+
+  conversations.forEach(function (conversation) {
+    const item = makeElement('li', 'conversation-item');
+    if (conversation.id === state.activeConversationId) item.classList.add('active');
+    const select = makeElement('button', 'conversation-select');
+    select.type = 'button';
+    select.setAttribute('aria-current', conversation.id === state.activeConversationId ? 'page' : 'false');
+    select.append(makeElement('span', 'conv-title', conversationTitle(conversation)));
+    select.append(makeElement('span', 'conv-date', formatRelativeDate(conversation.updatedAt)));
+    select.addEventListener('click', function () { selectConversation(conversation.id); });
+
+    const actions = makeElement('div', 'conv-actions');
+    actions.append(makeActionButton('Renommer la conversation', 'edit', function () {
+      renameConversation(conversation.id);
+    }, 'conv-action-btn'));
+    actions.append(makeActionButton('Supprimer la conversation', 'trash', function () {
+      deleteConversation(conversation.id);
+    }, 'conv-action-btn'));
+    item.append(select, actions);
+    list.append(item);
+  });
+}
+
+function selectConversation(conversationId) {
+  const conversation = state.conversations.find(function (candidate) {
+    return candidate.id === conversationId;
+  });
+  if (!conversation) return;
+  state.activeConversationId = conversation.id;
+  state.selectedProvider = knownProvider(conversation.provider) ? conversation.provider : state.selectedProvider;
+  state.selectedModel = conversation.model || firstModelId(state.selectedProvider);
+  state.editingMessageId = null;
+  saveSelection();
+  populateSelectors();
+  renderConversationList();
+  renderMessages();
+  closeSidebar();
+}
+
+function renameConversation(conversationId) {
+  const conversation = state.conversations.find(function (candidate) {
+    return candidate.id === conversationId;
+  });
+  if (!conversation) return;
+  const nextTitle = window.prompt('Renommer la conversation :', conversationTitle(conversation));
+  if (nextTitle === null) return;
+  const trimmed = nextTitle.trim();
+  if (!trimmed) return;
+  conversation.title = trimmed.slice(0, 120);
+  touchConversation(conversation);
+  saveConversations();
+  renderConversationList();
+}
+
+function deleteConversation(conversationId) {
+  if (state.streaming && conversationId === state.activeConversationId) {
+    announce('Arrête la réponse en cours avant de supprimer cette conversation.');
+    return;
+  }
+  const conversation = state.conversations.find(function (candidate) {
+    return candidate.id === conversationId;
+  });
+  if (!conversation) return;
+  if (!window.confirm('Supprimer définitivement « ' + conversationTitle(conversation) + ' » ? Cette action est irréversible.')) return;
+
+  state.conversations = state.conversations.filter(function (candidate) {
+    return candidate.id !== conversationId;
+  });
+  if (state.activeConversationId === conversationId) {
+    state.activeConversationId = state.conversations[0] ? state.conversations[0].id : null;
+    const next = getActiveConversation();
+    if (next) {
+      state.selectedProvider = next.provider;
+      state.selectedModel = next.model;
+    }
+  }
+  saveConversations();
+  saveSelection();
+  populateSelectors();
+  renderConversationList();
+  renderMessages();
+  announce('Conversation supprimée.');
+}
+
+function populateSelectors() {
+  const providerSelect = byId('providerSelect');
+  providerSelect.replaceChildren();
+  PROVIDER_KEYS.forEach(function (providerKey) {
+    const provider = PROVIDERS[providerKey];
+    const option = new Option(provider.name, providerKey, false, providerKey === state.selectedProvider);
+    providerSelect.add(option);
+  });
+  populateModelSelector();
+}
+
+function populateModelSelector() {
+  const provider = PROVIDERS[state.selectedProvider];
+  const modelSelect = byId('modelSelect');
+  if (!provider) return;
+  const models = modelsFor(state.selectedProvider);
+  const hasSelectedModel = models.some(function (model) {
+    return model.id === state.selectedModel;
+  });
+  if (!hasSelectedModel && !provider.allowCustomModel) {
+    state.selectedModel = firstModelId(state.selectedProvider);
+  }
+
+  modelSelect.replaceChildren();
+  models.forEach(function (model) {
+    const label = model.name + (model.free ? ' · Gratuit' : '');
+    const option = new Option(label, model.id, false, model.id === state.selectedModel);
+    modelSelect.add(option);
+  });
+
+  if (provider.allowCustomModel) {
+    if (!hasSelectedModel && state.selectedModel) {
+      modelSelect.add(new Option(state.selectedModel, state.selectedModel, false, true));
+    }
+    modelSelect.add(new Option('Identifiant personnalisé…', '__custom__'));
+  }
+  updateModelDisplay();
+}
+
+function updateModelDisplay() {
+  const display = byId('modelDisplayName');
+  if (display) display.textContent = formatModelLabel(state.selectedProvider, state.selectedModel);
+}
+
+function applySelectionToActiveConversation() {
+  const conversation = getActiveConversation();
+  if (!conversation) return;
+  conversation.provider = state.selectedProvider;
+  conversation.model = state.selectedModel;
+  touchConversation(conversation);
+  saveConversations();
+}
+
+function onProviderChange() {
+  const provider = byId('providerSelect').value;
+  if (!knownProvider(provider)) return;
+  state.selectedProvider = provider;
+  state.selectedModel = firstModelId(provider);
+  state.editingMessageId = null;
+  applySelectionToActiveConversation();
+  saveSelection();
+  populateModelSelector();
+  renderConversationList();
+}
+
+function onModelChange() {
+  const select = byId('modelSelect');
+  const nextValue = select.value;
+  if (nextValue === '__custom__') {
+    const customModel = window.prompt('Saisis l’identifiant exact du modèle :', state.selectedModel);
+    if (!customModel || !customModel.trim()) {
+      populateModelSelector();
+      return;
+    }
+    state.selectedModel = customModel.trim();
+  } else {
+    state.selectedModel = nextValue;
+  }
+  state.editingMessageId = null;
+  applySelectionToActiveConversation();
+  saveSelection();
+  populateModelSelector();
+}
+
+function resizeTextarea() {
+  const textarea = byId('composerTextarea');
+  textarea.style.height = 'auto';
+  textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+}
+
+function isMobileViewport() {
+  return window.matchMedia ? window.matchMedia('(max-width: 768px)').matches : window.innerWidth <= 768;
+}
+
+function updateComposer() {
+  const textarea = byId('composerTextarea');
+  const send = byId('sendBtn');
+  const stop = byId('stopBtn');
+  const provider = byId('providerSelect');
+  const model = byId('modelSelect');
+  const hasText = Boolean(textarea.value.trim());
+  textarea.disabled = state.streaming;
+  provider.disabled = state.streaming;
+  model.disabled = state.streaming;
+  send.hidden = state.streaming;
+  stop.hidden = !state.streaming;
+  send.disabled = state.streaming || !hasText;
+}
+
+function setSidebarOpen(open) {
+  const sidebar = byId('sidebar');
+  const overlay = byId('sidebarOverlay');
+  const shouldOpen = isMobileViewport() && Boolean(open);
+  sidebar.classList.toggle('open', shouldOpen);
+  sidebar.setAttribute('aria-hidden', shouldOpen || !isMobileViewport() ? 'false' : 'true');
+  sidebar.inert = isMobileViewport() && !shouldOpen;
+  overlay.hidden = !shouldOpen;
+  overlay.classList.toggle('open', shouldOpen);
+  overlay.setAttribute('aria-hidden', shouldOpen ? 'false' : 'true');
+  byId('sidebarToggle').setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+}
+
 function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebarOverlay');
-  const isOpen = sidebar.classList.toggle('open');
-  overlay.classList.toggle('open', isOpen);
-  document.body.style.overflow = isOpen ? 'hidden' : '';
+  setSidebarOpen(!byId('sidebar').classList.contains('open'));
 }
 
 function closeSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebarOverlay');
-  sidebar.classList.remove('open');
-  overlay.classList.remove('open');
-  document.body.style.overflow = '';
+  setSidebarOpen(false);
 }
 
-/* ===== INIT ===== */
-function init() {
-  loadState();
+function clearSettingsBody() {
+  byId('settingsBody').replaceChildren();
+}
 
-  // Theme
-  initTheme();
+function makeSettingsField(labelText, control) {
+  const field = makeElement('div', 'settings-field');
+  const label = makeElement('label', '', labelText);
+  if (control.id) label.htmlFor = control.id;
+  field.append(label, control);
+  return field;
+}
 
-  // Make sure we have at least one conversation
-  if (state.conversations.length === 0) {
-    createConversation();
-  } else if (!state.activeConvId) {
-    state.activeConvId = state.conversations[0].id;
-    saveActiveConv();
+function renderSettings() {
+  const body = byId('settingsBody');
+  clearSettingsBody();
+  body.append(makeElement('h3', '', 'Clés API'));
+  body.append(makeElement('p', 'settings-helper', 'Les clés sont enregistrées uniquement dans le localStorage de ce navigateur. Elles ne sont envoyées qu’au fournisseur que tu choisis.'));
+
+  PROVIDER_KEYS.forEach(function (providerKey) {
+    const provider = PROVIDERS[providerKey];
+    const group = makeElement('div', 'settings-group');
+    const label = makeElement('label', '', provider.name);
+    label.htmlFor = 'apiKey-' + providerKey;
+    const field = makeElement('div', 'api-key-field');
+    const input = makeElement('input');
+    input.type = 'password';
+    input.id = 'apiKey-' + providerKey;
+    input.value = state.apiKeys[providerKey] || '';
+    input.placeholder = provider.keyPlaceholder || 'Clé API';
+    input.autocomplete = 'off';
+    input.spellcheck = false;
+    input.setAttribute('aria-label', 'Clé API ' + provider.name);
+    const visibility = makeActionButton('Afficher la clé', 'eye', function () {
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      visibility.setAttribute('aria-label', isPassword ? 'Masquer la clé' : 'Afficher la clé');
+      visibility.replaceChildren(makeIcon(isPassword ? 'eyeOff' : 'eye'));
+    }, 'api-key-toggle');
+    field.append(input, visibility);
+    if (provider.docsUrl) {
+      const link = makeElement('a', 'api-key-docs');
+      link.href = provider.docsUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.setAttribute('aria-label', 'Obtenir une clé ' + provider.name);
+      link.title = 'Obtenir une clé';
+      link.append(makeIcon('external'));
+      field.append(link);
+    }
+    group.append(label, field);
+    body.append(group);
+  });
+
+  const zenTools = makeElement('div', 'settings-inline-action');
+  const zenDescription = makeElement('p', 'settings-helper', 'Zen propose plusieurs formats d’API. OmniChat n’affiche que les modèles compatibles avec Chat Completions ; les six gratuits sont déjà intégrés.');
+  const refreshZen = makeElement('button', 'btn btn-secondary', 'Rafraîchir les modèles Zen');
+  refreshZen.type = 'button';
+  refreshZen.append(makeIcon('download'));
+  refreshZen.addEventListener('click', function () {
+    refreshZenModels(refreshZen);
+  });
+  zenTools.append(zenDescription, refreshZen);
+  body.append(zenTools);
+
+  body.append(makeElement('h3', '', 'Paramètres du modèle'));
+  const parameters = makeElement('div', 'settings-row');
+  const temperature = makeElement('input');
+  temperature.id = 'settingsTemperature';
+  temperature.type = 'number';
+  temperature.min = '0';
+  temperature.max = '2';
+  temperature.step = '0.1';
+  temperature.value = String(state.settings.temperature);
+  parameters.append(makeSettingsField('Température', temperature));
+  const maxTokens = makeElement('input');
+  maxTokens.id = 'settingsMaxTokens';
+  maxTokens.type = 'number';
+  maxTokens.min = '1';
+  maxTokens.max = '128000';
+  maxTokens.step = '1';
+  maxTokens.value = String(state.settings.maxTokens);
+  parameters.append(makeSettingsField('Max tokens', maxTokens));
+  body.append(parameters);
+
+  const systemPrompt = makeElement('textarea');
+  systemPrompt.id = 'settingsSystemPrompt';
+  systemPrompt.rows = 4;
+  systemPrompt.value = state.settings.systemPrompt;
+  body.append(makeSettingsField('System prompt global', systemPrompt));
+}
+
+function openSettings(focusProviderKey) {
+  lastFocusedElement = document.activeElement;
+  settingsFocusProvider = knownProvider(focusProviderKey) ? focusProviderKey : null;
+  renderSettings();
+  const modal = byId('settingsModal');
+  modal.hidden = false;
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('modal-open');
+  window.requestAnimationFrame(function () {
+    modal.classList.add('open');
+    const target = settingsFocusProvider ? byId('apiKey-' + settingsFocusProvider) : byId('settingsClose');
+    if (target) target.focus();
+  });
+}
+
+function closeSettings(restoreFocus) {
+  const modal = byId('settingsModal');
+  if (modal.hidden) return;
+  modal.classList.remove('open');
+  modal.hidden = true;
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('modal-open');
+  if (restoreFocus !== false && lastFocusedElement && typeof lastFocusedElement.focus === 'function' && lastFocusedElement.isConnected) {
+    lastFocusedElement.focus();
   }
+  lastFocusedElement = null;
+  settingsFocusProvider = null;
+}
 
-  // Restore selected provider/model from active conversation
-  const conv = getActiveConversation();
-  if (conv && conv.provider && conv.model) {
-    state.selectedProvider = conv.provider;
-    state.selectedModel = conv.model;
+function saveSettingsFromModal() {
+  const nextKeys = {};
+  PROVIDER_KEYS.forEach(function (providerKey) {
+    const input = byId('apiKey-' + providerKey);
+    const key = input ? input.value.trim() : '';
+    if (key) nextKeys[providerKey] = key;
+  });
+  state.apiKeys = nextKeys;
+  state.settings.temperature = clamp(byId('settingsTemperature').value, 0, 2, DEFAULT_SETTINGS.temperature);
+  state.settings.maxTokens = Math.round(clamp(byId('settingsMaxTokens').value, 1, 128000, DEFAULT_SETTINGS.maxTokens));
+  state.settings.systemPrompt = byId('settingsSystemPrompt').value.trim();
+  saveApiKeys();
+  saveSettings();
+  closeSettings();
+  renderMessages();
+  announce('Paramètres enregistrés.');
+}
+
+async function refreshZenModels(button) {
+  const initialText = button.textContent;
+  button.disabled = true;
+  button.textContent = 'Actualisation…';
+  try {
+    const response = await fetch(PROVIDERS.opencode.baseUrl + '/models');
+    if (!response.ok) throw await responseError(response);
+    const payload = await response.json();
+    const candidates = Array.isArray(payload) ? payload : (Array.isArray(payload.data) ? payload.data : []);
+    const unique = new Map();
+    let skipped = 0;
+    candidates.forEach(function (candidate) {
+      const rawId = typeof candidate === 'string' ? candidate : candidate && candidate.id;
+      if (!rawId || typeof rawId !== 'string') return;
+      if (!zenSupportsChatCompletions(rawId)) {
+        skipped += 1;
+        return;
+      }
+      const id = rawId.indexOf('opencode/') === 0 ? rawId : 'opencode/' + rawId;
+      const name = typeof candidate === 'object' && candidate.name ? candidate.name : rawId.replace(/^opencode\//, '');
+      unique.set(id, {
+        id: id,
+        name: name,
+        free: /free|big-pickle/i.test(id)
+      });
+    });
+    state.zenModels = Array.from(unique.values()).sort(function (a, b) {
+      return a.name.localeCompare(b.name);
+    });
+    if (state.selectedProvider === 'opencode') populateModelSelector();
+    announce(state.zenModels.length + ' modèles Zen compatibles Chat Completions disponibles dans cette session.' + (skipped ? ' ' + skipped + ' modèle(s) d’un autre format ont été ignorés.' : ''));
+  } catch (error) {
+    announce(friendlyError(error, PROVIDERS.opencode));
+  } finally {
+    button.disabled = false;
+    button.textContent = initialText;
+    button.prepend(makeIcon('download'));
   }
+}
 
-  // Populate UI
-  populateModelSelector();
+function clearAllData() {
+  if (!window.confirm('Tout effacer ? Toutes les conversations, clés API, réglages et préférences de thème seront supprimés de ce navigateur.')) return;
+  if (state.abortController) state.abortController.abort();
+  state.requestNumber += 1;
+  state.streaming = false;
+  state.streamingMessageId = null;
+  state.abortController = null;
+  Object.keys(STORAGE).forEach(function (key) {
+    localStorage.removeItem(STORAGE[key]);
+  });
+  state.conversations = [];
+  state.activeConversationId = null;
+  state.apiKeys = {};
+  state.settings = Object.assign({}, DEFAULT_SETTINGS);
+  state.selectedProvider = 'openai';
+  state.selectedModel = firstModelId('openai');
+  state.themePreference = 'system';
+  state.zenModels = [];
+  state.editingMessageId = null;
+  closeSettings(false);
+  applyTheme();
+  populateSelectors();
   renderConversationList();
   renderMessages();
-  updateComposerState();
+  updateComposer();
+  announce('Les données locales ont été effacées.');
+}
 
-  // Wire events
-  wireEvents();
+class ProviderRequestError extends Error {
+  constructor(status, message) {
+    super(message || 'Erreur du fournisseur');
+    this.name = 'ProviderRequestError';
+    this.status = status;
+  }
+}
 
-  // Auto-scroll on new content
-  const observer = new MutationObserver(() => {
-    if (state.streaming && isNearBottom()) {
-      scrollToBottom();
+async function responseError(response) {
+  let message = '';
+  try {
+    const body = await response.text();
+    try {
+      const json = JSON.parse(body);
+      message = json.error && typeof json.error.message === 'string' ? json.error.message : (json.message || '');
+    } catch (error) {
+      message = body.slice(0, 300);
     }
-    updateScrollButton();
-  });
-  observer.observe(document.getElementById('messagesInner'), { childList: true, subtree: true, characterData: true });
+  } catch (error) {
+    message = '';
+  }
+  return new ProviderRequestError(response.status, message);
+}
 
-  // Scroll on resize
-  document.getElementById('composerTextarea').addEventListener('input', () => {
-    if (isNearBottom()) {
-      setTimeout(scrollToBottom, 50);
+function endpoint(baseUrl, path) {
+  return baseUrl.replace(/\/+$/, '') + path;
+}
+
+function contentToText(content) {
+  if (typeof content === 'string') return content;
+  if (!Array.isArray(content)) return '';
+  return content.map(function (part) {
+    if (typeof part === 'string') return part;
+    if (part && typeof part.text === 'string') return part.text;
+    if (part && part.text && typeof part.text.value === 'string') return part.text.value;
+    return '';
+  }).join('');
+}
+
+async function consumeSse(response, onData) {
+  if (!response.body || !response.body.getReader) throw new Error('Le fournisseur ne fournit pas de flux lisible.');
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  function consumeBlock(block) {
+    const data = block.split(/\r?\n/).filter(function (line) {
+      return line.indexOf('data:') === 0;
+    }).map(function (line) {
+      return line.slice(5).trimStart();
+    }).join('\n').trim();
+    if (data) onData(data);
+  }
+
+  while (true) {
+    const chunk = await reader.read();
+    if (chunk.done) break;
+    buffer += decoder.decode(chunk.value, { stream: true });
+    let boundary = buffer.search(/\r?\n\r?\n/);
+    while (boundary !== -1) {
+      const block = buffer.slice(0, boundary);
+      const separatorLength = buffer.slice(boundary).indexOf('\r\n') === 0 ? 4 : 2;
+      buffer = buffer.slice(boundary + separatorLength);
+      consumeBlock(block);
+      boundary = buffer.search(/\r?\n\r?\n/);
+    }
+  }
+  buffer += decoder.decode();
+  if (buffer.trim()) consumeBlock(buffer);
+}
+
+async function sendOpenAiCompatible(options) {
+  if (options.providerKey === 'opencode' && !zenSupportsChatCompletions(options.modelId)) {
+    throw new Error('Ce modèle Zen utilise un autre endpoint que Chat Completions. Choisis un modèle Zen compatible, par exemple Big Pickle ou DeepSeek V4 Flash Free.');
+  }
+
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: 'Bearer ' + options.apiKey
+  };
+  if (options.providerKey === 'openrouter') {
+    headers['HTTP-Referer'] = window.location.origin;
+    headers['X-Title'] = 'OmniChat';
+  }
+
+  const body = {
+    model: options.modelId,
+    messages: options.messages,
+    temperature: options.settings.temperature,
+    stream: true
+  };
+  /* OpenAI deprecates max_tokens in favour of max_completion_tokens. The other
+     compatible APIs still expect max_tokens, so keep their wire format intact. */
+  body[options.providerKey === 'openai' ? 'max_completion_tokens' : 'max_tokens'] = options.settings.maxTokens;
+
+  const response = await fetch(endpoint(options.provider.baseUrl, '/chat/completions'), {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify(body),
+    signal: options.signal
+  });
+  if (!response.ok) throw await responseError(response);
+
+  await consumeSse(response, function (data) {
+    if (data === '[DONE]') return;
+    try {
+      const event = JSON.parse(data);
+      const text = contentToText(event.choices && event.choices[0] && event.choices[0].delta ? event.choices[0].delta.content : '');
+      if (text) options.onToken(text);
+    } catch (error) {
+      console.warn('Événement SSE OpenAI-compatible ignoré.', error);
     }
   });
+}
 
-  // Handle visibility change to restore focus
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && !state.streaming) {
-      document.getElementById('composerTextarea')?.focus();
+async function sendAnthropic(options) {
+  const system = options.messages.filter(function (message) {
+    return message.role === 'system';
+  }).map(function (message) {
+    return message.content;
+  }).join('\n');
+  const messages = options.messages.filter(function (message) {
+    return message.role !== 'system';
+  });
+  const body = {
+    model: options.modelId,
+    messages: messages,
+    max_tokens: options.settings.maxTokens,
+    temperature: options.settings.temperature,
+    stream: true
+  };
+  if (system) body.system = system;
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': options.apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify(body),
+    signal: options.signal
+  });
+  if (!response.ok) throw await responseError(response);
+
+  await consumeSse(response, function (data) {
+    try {
+      const event = JSON.parse(data);
+      if (event.type === 'content_block_start' && event.content_block && event.content_block.text) {
+        options.onToken(event.content_block.text);
+      }
+      if (event.type === 'content_block_delta' && event.delta && event.delta.text) {
+        options.onToken(event.delta.text);
+      }
+    } catch (error) {
+      console.warn('Événement SSE Anthropic ignoré.', error);
     }
   });
+}
+
+async function sendGemini(options) {
+  const system = options.messages.filter(function (message) {
+    return message.role === 'system';
+  }).map(function (message) {
+    return message.content;
+  }).join('\n');
+  const contents = options.messages.filter(function (message) {
+    return message.role !== 'system';
+  }).map(function (message) {
+    return {
+      role: message.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: message.content }]
+    };
+  });
+  const body = {
+    contents: contents,
+    generationConfig: {
+      temperature: options.settings.temperature,
+      maxOutputTokens: options.settings.maxTokens
+    }
+  };
+  if (system) body.systemInstruction = { parts: [{ text: system }] };
+
+  const url = endpoint(options.provider.baseUrl, '/models/') + encodeURIComponent(options.modelId) + ':streamGenerateContent?alt=sse&key=' + encodeURIComponent(options.apiKey);
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+    signal: options.signal
+  });
+  if (!response.ok) throw await responseError(response);
+
+  await consumeSse(response, function (data) {
+    try {
+      const event = JSON.parse(data);
+      const parts = event.candidates && event.candidates[0] && event.candidates[0].content ? event.candidates[0].content.parts : [];
+      const text = Array.isArray(parts) ? parts.map(function (part) { return part.text || ''; }).join('') : '';
+      if (text) options.onToken(text);
+    } catch (error) {
+      console.warn('Événement SSE Gemini ignoré.', error);
+    }
+  });
+}
+
+const ADAPTERS = {
+  openai: sendOpenAiCompatible,
+  anthropic: sendAnthropic,
+  gemini: sendGemini
+};
+
+function buildApiMessages(conversation, assistantMessage, systemPrompt) {
+  const messages = [];
+  if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
+  const end = conversation.messages.findIndex(function (message) {
+    return message.id === assistantMessage.id;
+  });
+  const source = end === -1 ? conversation.messages : conversation.messages.slice(0, end);
+  source.forEach(function (message) {
+    if ((message.role === 'user' || message.role === 'assistant') && message.content && !message.isError) {
+      messages.push({ role: message.role, content: message.content });
+    }
+  });
+  return messages;
+}
+
+function friendlyError(error, provider) {
+  if (error && ERROR_MESSAGES[error.status]) return ERROR_MESSAGES[error.status];
+  if (error && error.name === 'TypeError') {
+    if (provider === PROVIDERS.opencode) {
+      return 'OpenCode Zen ne répond pas actuellement aux appels CORS depuis GitHub Pages. Cette app statique ne peut pas contourner ce blocage du fournisseur ; utilise un autre fournisseur ou un proxy que tu contrôles.';
+    }
+    return 'Impossible de joindre ' + provider.name + '. Vérifie ta connexion et le CORS autorisé par ce fournisseur.';
+  }
+  if (error && error.message) {
+    const message = error.message.replace(/\s+/g, ' ').trim();
+    if (message && message.length < 220) return 'Erreur avec ' + provider.name + ' : ' + message;
+  }
+  return 'Erreur de connexion avec ' + provider.name + '. Vérifie ta connexion, la clé API et le CORS, puis réessaie.';
+}
+
+function markAssistantError(conversation, message, error, provider) {
+  message.isError = true;
+  message.stopped = false;
+  message.content = friendlyError(error, provider);
+  touchConversation(conversation);
+  saveConversations();
+  renderMessages();
+  announce('La réponse a échoué. Un bouton Réessayer est disponible.');
+}
+
+async function startAssistantResponse(conversation, providerKey, modelId) {
+  if (state.streaming) return;
+  const provider = PROVIDERS[providerKey];
+  const adapter = provider && ADAPTERS[provider.adapter];
+  const apiKey = state.apiKeys[providerKey];
+  if (!provider || !adapter || !apiKey) return;
+
+  const model = modelFor(providerKey, modelId);
+  const assistantMessage = {
+    id: generateId(),
+    role: 'assistant',
+    content: '',
+    createdAt: Date.now(),
+    providerKey: providerKey,
+    modelId: modelId,
+    modelLabel: formatModelLabel(providerKey, modelId),
+    free: Boolean(model.free),
+    isError: false,
+    stopped: false
+  };
+  const wasNearBottom = isNearBottom();
+  conversation.messages.push(assistantMessage);
+  touchConversation(conversation);
+  state.streaming = true;
+  state.streamingMessageId = assistantMessage.id;
+  state.abortController = new AbortController();
+  state.requestNumber += 1;
+  const requestNumber = state.requestNumber;
+  state.followOutput = wasNearBottom;
+  saveConversations();
+  renderMessages();
+  updateComposer();
+  if (wasNearBottom) scrollToBottom(false);
+  announce('Réponse en cours avec ' + assistantMessage.modelLabel + '.');
+
+  const settings = {
+    temperature: state.settings.temperature,
+    maxTokens: state.settings.maxTokens,
+    systemPrompt: state.settings.systemPrompt
+  };
+  const messages = buildApiMessages(conversation, assistantMessage, settings.systemPrompt);
+
+  try {
+    await adapter({
+      provider: provider,
+      providerKey: providerKey,
+      apiKey: apiKey,
+      modelId: modelId,
+      messages: messages,
+      settings: settings,
+      signal: state.abortController.signal,
+      onToken: function (token) {
+        if (requestNumber !== state.requestNumber) return;
+        assistantMessage.content += token;
+        queueAssistantRender(assistantMessage);
+      }
+    });
+    if (requestNumber !== state.requestNumber) return;
+    if (!assistantMessage.content.trim()) {
+      markAssistantError(conversation, assistantMessage, new Error('Le fournisseur n’a renvoyé aucun texte.'), provider);
+      return;
+    }
+    touchConversation(conversation);
+    saveConversations();
+    announce('Réponse terminée.');
+  } catch (error) {
+    if (requestNumber !== state.requestNumber) return;
+    if (error && error.name === 'AbortError') {
+      assistantMessage.stopped = true;
+      touchConversation(conversation);
+      saveConversations();
+      announce('Génération interrompue.');
+    } else {
+      markAssistantError(conversation, assistantMessage, error, provider);
+    }
+  } finally {
+    if (requestNumber === state.requestNumber) {
+      state.streaming = false;
+      state.streamingMessageId = null;
+      state.abortController = null;
+      renderConversationList();
+      renderMessages();
+      updateComposer();
+      updateScrollButton();
+    }
+  }
+}
+
+function sendMessage(text) {
+  const content = String(text || '').trim();
+  if (!content || state.streaming) return;
+  const provider = PROVIDERS[state.selectedProvider];
+  if (!state.apiKeys[state.selectedProvider]) {
+    announce('Ajoute une clé API pour le fournisseur sélectionné.');
+    openSettings(state.selectedProvider);
+    return;
+  }
+  const conversation = ensureActiveConversation();
+  state.editingMessageId = null;
+  const wasNearBottom = isNearBottom();
+  conversation.provider = state.selectedProvider;
+  conversation.model = state.selectedModel;
+  conversation.messages.push({
+    id: generateId(),
+    role: 'user',
+    content: content,
+    createdAt: Date.now(),
+    isError: false,
+    stopped: false
+  });
+  if (conversation.title === 'Nouveau chat') conversation.title = conversationTitle(conversation);
+  touchConversation(conversation);
+  state.followOutput = wasNearBottom;
+  saveConversations();
+  saveSelection();
+  renderConversationList();
+  renderMessages();
+  if (wasNearBottom) scrollToBottom(false);
+  startAssistantResponse(conversation, state.selectedProvider, state.selectedModel);
+}
+
+function submitComposer() {
+  const textarea = byId('composerTextarea');
+  const content = textarea.value;
+  if (!content.trim() || state.streaming) return;
+  textarea.value = '';
+  resizeTextarea();
+  updateComposer();
+  sendMessage(content);
+}
+
+function retryAssistantMessage(messageId) {
+  if (state.streaming) return;
+  const conversation = getActiveConversation();
+  if (!conversation) return;
+  const index = conversation.messages.findIndex(function (message) {
+    return message.id === messageId;
+  });
+  if (index < 1 || conversation.messages[index].role !== 'assistant') return;
+  const previousMessages = conversation.messages.slice(0, index);
+  if (!previousMessages.some(function (message) { return message.role === 'user'; })) return;
+  const original = conversation.messages[index];
+  conversation.messages = previousMessages;
+  touchConversation(conversation);
+  saveConversations();
+  renderMessages();
+  startAssistantResponse(conversation, original.providerKey || state.selectedProvider, original.modelId || state.selectedModel);
+}
+
+function handleDocumentKeydown(event) {
+  const modal = byId('settingsModal');
+  if (event.key === 'Escape') {
+    if (!modal.hidden) {
+      event.preventDefault();
+      closeSettings();
+      return;
+    }
+    if (state.editingMessageId) {
+      event.preventDefault();
+      cancelEditing();
+      return;
+    }
+    if (byId('sidebar').classList.contains('open')) {
+      event.preventDefault();
+      closeSidebar();
+    }
+  }
+
+  if (event.key === 'Tab' && !modal.hidden) {
+    const focusable = Array.from(modal.querySelectorAll('button:not([disabled]), input:not([disabled]), textarea:not([disabled]), a[href]')).filter(function (element) {
+      return !element.hidden;
+    });
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
 }
 
 function wireEvents() {
-  // Sidebar
-  document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
-  document.getElementById('sidebarToggleSide').addEventListener('click', toggleSidebar);
-  document.getElementById('sidebarClose').addEventListener('click', closeSidebar);
-  document.getElementById('sidebarOverlay').addEventListener('click', closeSidebar);
-
-  // New chat
-  document.getElementById('newChatBtn').addEventListener('click', () => {
+  byId('newChatBtn').addEventListener('click', function () {
+    if (state.streaming) {
+      announce('Arrête la réponse en cours avant de créer un nouveau chat.');
+      return;
+    }
     createConversation();
     renderConversationList();
     renderMessages();
-    populateModelSelector();
     closeSidebar();
-    document.getElementById('composerTextarea').focus();
+  });
+  byId('sidebarToggle').addEventListener('click', toggleSidebar);
+  byId('sidebarToggleSide').addEventListener('click', closeSidebar);
+  byId('sidebarClose').addEventListener('click', closeSidebar);
+  byId('sidebarOverlay').addEventListener('click', closeSidebar);
+  byId('searchConv').addEventListener('input', renderConversationList);
+
+  byId('providerSelect').addEventListener('change', onProviderChange);
+  byId('modelSelect').addEventListener('change', onModelChange);
+  byId('themeToggle').addEventListener('click', toggleTheme);
+  byId('settingsBtn').addEventListener('click', function () { openSettings(); });
+  byId('headerSettingsBtn').addEventListener('click', function () { openSettings(); });
+  byId('settingsClose').addEventListener('click', function () { closeSettings(); });
+  byId('settingsSaveBtn').addEventListener('click', saveSettingsFromModal);
+  byId('clearAllBtn').addEventListener('click', clearAllData);
+  byId('settingsModal').addEventListener('click', function (event) {
+    if (event.target === event.currentTarget) closeSettings();
   });
 
-  // Conversation list delegation
-  document.getElementById('conversationList').addEventListener('click', (e) => {
-    const item = e.target.closest('.conversation-item');
-    if (!item) return;
-
-    const action = e.target.closest('[data-action]')?.dataset.action;
-
-    if (action === 'delete') {
-      deleteConversation(item.dataset.id);
-      renderConversationList();
-      renderMessages();
-      populateModelSelector();
-      return;
-    }
-
-    if (action === 'rename') {
-      const currentTitle = getConversationTitle(state.conversations.find(c => c.id === item.dataset.id));
-      const newTitle = prompt('Renommer la conversation :', currentTitle);
-      if (newTitle !== null && newTitle.trim()) {
-        renameConversation(item.dataset.id, newTitle.trim());
-        renderConversationList();
-      }
-      return;
-    }
-
-    // Select conversation
-    state.activeConvId = item.dataset.id;
-    saveActiveConv();
-
-    const conv = getActiveConversation();
-    if (conv) {
-      state.selectedProvider = conv.provider || state.selectedProvider;
-      state.selectedModel = conv.model || state.selectedModel;
-      populateModelSelector();
-    }
-
-    renderConversationList();
-    renderMessages();
-    closeSidebar();
-    document.getElementById('composerTextarea').focus();
+  byId('composerForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    submitComposer();
   });
-
-  // Provider/Model selectors
-  document.getElementById('providerSelect').addEventListener('change', (e) => {
-    state.selectedProvider = e.target.value;
-    const provider = PROVIDERS[state.selectedProvider];
-    state.selectedModel = provider.models[0]?.id || '';
-    updateModelSelector();
-    updateModelDisplayName();
-
-    // Update current conversation
-    const conv = getActiveConversation();
-    if (conv) {
-      conv.provider = state.selectedProvider;
-      conv.model = state.selectedModel;
-      saveConversations();
+  byId('composerTextarea').addEventListener('input', function () {
+    resizeTextarea();
+    updateComposer();
+  });
+  byId('composerTextarea').addEventListener('keydown', function (event) {
+    if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+      event.preventDefault();
+      submitComposer();
     }
   });
-
-  document.getElementById('modelSelect').addEventListener('change', (e) => {
-    const val = e.target.value;
-    if (val === '__custom__') {
-      const customId = prompt('Entrez l\'identifiant du modèle (ex: openai/gpt-5.6-sol) :', state.selectedModel);
-      if (customId && customId.trim()) {
-        state.selectedModel = customId.trim();
-      }
-      // Reset select to current model
-      updateModelSelector();
-    } else {
-      state.selectedModel = val;
-    }
-    updateModelDisplayName();
-    const conv = getActiveConversation();
-    if (conv) {
-      conv.model = state.selectedModel;
-      saveConversations();
-    }
+  byId('stopBtn').addEventListener('click', function () {
+    if (state.abortController) state.abortController.abort();
   });
-
-  // Send
-  document.getElementById('sendBtn').addEventListener('click', () => {
-    const textarea = document.getElementById('composerTextarea');
-    const content = textarea.value.trim();
-    if (!content) return;
-    textarea.value = '';
-    autoResizeTextarea(textarea);
-    sendMessage(content);
+  byId('messagesContainer').addEventListener('scroll', function () {
+    state.followOutput = isNearBottom();
+    updateScrollButton();
   });
-
-  // Stop
-  document.getElementById('stopBtn').addEventListener('click', () => {
-    if (state.abortController) {
-      state.abortController.abort();
-    }
+  byId('scrollBottomBtn').addEventListener('click', function () {
+    scrollToBottom(true);
   });
-
-  // Textarea
-  const textarea = document.getElementById('composerTextarea');
-  textarea.addEventListener('input', () => autoResizeTextarea(textarea));
-
-  textarea.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-      e.preventDefault();
-      document.getElementById('sendBtn').click();
-    }
-    if (e.key === 'Enter' && e.shiftKey) {
-      // Allow newline
-      return;
-    }
-    if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
-      // In simple mode, Enter sends. But with shift+enter for newline.
-      // Since we have Ctrl+Enter as primary, let's also allow plain Enter to send
-      e.preventDefault();
-      document.getElementById('sendBtn').click();
-    }
+  document.addEventListener('keydown', handleDocumentKeydown);
+  window.addEventListener('resize', function () {
+    setSidebarOpen(byId('sidebar').classList.contains('open'));
+    updateScrollButton();
   });
-
-  // Theme
-  document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-
-  // Settings
-  const openSettingsButtons = ['settingsBtn', 'headerSettingsBtn'];
-  openSettingsButtons.forEach(id => {
-    document.getElementById(id)?.addEventListener('click', openSettings);
-  });
-
-  document.getElementById('settingsClose').addEventListener('click', closeSettings);
-  document.getElementById('settingsModal').addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) closeSettings();
-  });
-  document.getElementById('settingsSaveBtn').addEventListener('click', saveSettingsFromModal);
-  document.getElementById('clearAllBtn').addEventListener('click', clearAllData);
-
-  // Scroll button
-  document.getElementById('scrollBottomBtn').addEventListener('click', scrollToBottom);
-
-  // Messages container scroll
-  document.getElementById('messagesContainer').addEventListener('scroll', updateScrollButton);
-
-  // Search
-  document.getElementById('searchConv').addEventListener('input', (e) => {
-    renderConversationList(e.target.value);
-  });
-
-  // Keyboard shortcuts (global)
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      if (document.getElementById('settingsModal').classList.contains('open')) {
-        closeSettings();
-      } else if (state.editingMessageId) {
-        state.editingMessageId = null;
-        document.getElementById('composerTextarea').focus();
-      } else if (window.innerWidth <= 768 && document.getElementById('sidebar').classList.contains('open')) {
-        closeSidebar();
-      }
-    }
-  });
-
-  // Focus composer after load
-  setTimeout(() => textarea.focus(), 100);
+  if (window.matchMedia) {
+    const query = window.matchMedia('(prefers-color-scheme: dark)');
+    query.addEventListener('change', function () {
+      if (state.themePreference === 'system') applyTheme();
+    });
+  }
 }
 
-// Global functions for inline onclick
-window.__regenerate = function(msgId) {
-  if (msgId && typeof msgId === 'string') {
-    // Regenerate from a specific assistant message
-    const conv = getActiveConversation();
-    if (!conv) return;
-    const idx = conv.messages.findIndex(m => m.id === msgId);
-    if (idx === -1) return;
-    // Remove this and all after
-    conv.messages = conv.messages.slice(0, idx);
-    const lastUserIdx = [...conv.messages].reverse().findIndex(m => m.role === 'user');
-    if (lastUserIdx === -1) return;
-    const lastUserMsg = conv.messages[conv.messages.length - 1 - lastUserIdx];
-    saveConversations();
-    const textarea = document.getElementById('composerTextarea');
-    textarea.value = lastUserMsg.content;
-    document.getElementById('sendBtn').click();
-  } else {
-    regenerateLastMessage();
+function init() {
+  loadState();
+  if (window.marked && typeof window.marked.setOptions === 'function') {
+    window.marked.setOptions({ breaks: true, gfm: true });
   }
-};
-window.__editResend = editAndResend;
-window.openSettings = openSettings;
-window.useSuggestedPrompt = useSuggestedPrompt;
+  applyTheme();
+  populateSelectors();
+  setSidebarOpen(false);
+  renderConversationList();
+  renderMessages();
+  resizeTextarea();
+  updateComposer();
+  wireEvents();
+}
 
-/* ===== START ===== */
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
+  document.addEventListener('DOMContentLoaded', init, { once: true });
 } else {
   init();
 }
