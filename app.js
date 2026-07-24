@@ -920,7 +920,7 @@ function queueAssistantRender(message) {
     const content = messageElement ? messageElement.querySelector('[data-message-content]') : null;
     if (content) renderRichContent(content, pending.content);
     if (messageElement) messageElement.classList.add('streaming');
-    if (state.followOutput) scrollToBottom(false);
+    if (state.followOutput) scrollToBottom();
     else updateScrollButton();
   });
 }
@@ -940,7 +940,7 @@ function updateScrollButton() {
 function scrollToBottom(smooth) {
   const container = byId('messagesContainer');
   if (!container) return;
-  if (smooth && typeof container.scrollTo === 'function') {
+  if (smooth !== false && typeof container.scrollTo === 'function') {
     container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
   } else {
     container.scrollTop = container.scrollHeight;
@@ -1909,7 +1909,7 @@ async function startAssistantResponse(conversation, providerKey, modelId) {
   saveConversations();
   renderMessages();
   updateComposer();
-  if (wasNearBottom) scrollToBottom(false);
+  if (wasNearBottom) scrollToBottom();
   announce('Réponse en cours avec ' + assistantMessage.modelLabel + '.');
 
   const settings = {
@@ -1994,7 +1994,7 @@ function sendMessage(text) {
   saveSelection();
   renderConversationList();
   renderMessages();
-  if (wasNearBottom) scrollToBottom(false);
+  if (wasNearBottom) scrollToBottom();
   startAssistantResponse(conversation, state.selectedProvider, state.selectedModel);
 }
 
