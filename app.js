@@ -149,7 +149,8 @@ const STORAGE = {
 const DEFAULT_SETTINGS = {
   temperature: 0.7,
   maxTokens: 4096,
-  systemPrompt: 'Tu es un assistant IA utile, précis et concis.'
+  systemPrompt: 'Tu es un assistant IA utile, précis et concis.',
+  zenProxyUrl: ''
 };
 
 const SUGGESTED_PROMPTS = [
@@ -285,8 +286,36 @@ function knownProvider(providerKey) {
   return Object.prototype.hasOwnProperty.call(PROVIDERS, providerKey);
 }
 
+function normaliseUrl(value) {
+  const input = String(value || '').trim();
+  if (!input) return '';
+  try {
+    const url = new URL(input);
+    if (url.protocol !== 'https:' && url.protocol !== 'http:') return '';
+    return url.href.replace(/\/+$/, '');
+  } catch (error) {
+    return '';
+  }
+}
+
+function zenRelayUrl() {
+  return normaliseUrl(state.settings.zenProxyUrl);
+}
+
+function hasZenRelay() {
+  return Boolean(zenRelayUrl());
+}
+
+function requestBaseUrl(providerKey, fallbackUrl) {
+  return providerKey === 'opencode' && hasZenRelay() ? zenRelayUrl() : fallbackUrl;
+}
+
+function zenApiModelId(modelId) {
+  return String(modelId || '').replace(/^opencode\//, '');
+}
+
 function zenSupportsChatCompletions(modelId) {
-  const bareId = String(modelId || '').replace(/^opencode\//, '');
+  const bareId = zenApiModelId(modelId);
   return !ZEN_NON_CHAT_COMPLETIONS_PREFIXES.some(function (prefix) {
     return bareId.indexOf(prefix) === 0;
   });
@@ -399,6 +428,7 @@ function loadState() {
   state.settings.temperature = clamp(storedSettings.temperature, 0, 2, DEFAULT_SETTINGS.temperature);
   state.settings.maxTokens = Math.round(clamp(storedSettings.maxTokens, 1, 128000, DEFAULT_SETTINGS.maxTokens));
   state.settings.systemPrompt = typeof storedSettings.systemPrompt === 'string' ? storedSettings.systemPrompt : DEFAULT_SETTINGS.systemPrompt;
+  state.settings.zenProxyUrl = normaliseUrl(storedSettings.zenProxyUrl);
 
   const storedSelection = readJson(STORAGE.selection, {});
   const legacyActive = localStorage.getItem(STORAGE.activeConversation);
@@ -1267,8 +1297,29 @@ function renderSettings() {
     body.append(group);
   });
 
+  body.append(makeElement('h3', '', 'OpenCode Zen'));
+  const zenConnection = makeElement('div', 'settings-zen-connection');
+  const zenHint = makeElement('p', 'settings-helper', 'Zen bloque les appels CORS directs depuis GitHub Pages. Colle l’URL HTTPS de ton relais privé : ta clé reste dans le localStorage, puis elle et tes messages transitent par ce relais vers Zen.');
+  zenHint.id = 'settingsZenProxyHelp';
+  const zenProxyUrl = makeElement('input');
+  zenProxyUrl.id = 'settingsZenProxyUrl';
+  zenProxyUrl.type = 'url';
+  zenProxyUrl.inputMode = 'url';
+  zenProxyUrl.autocomplete = 'url';
+  zenProxyUrl.placeholder = 'https://omnichat-zen-proxy.example.workers.dev';
+  zenProxyUrl.value = state.settings.zenProxyUrl;
+  zenProxyUrl.setAttribute('aria-describedby', zenHint.id);
+  zenConnection.append(zenHint, makeSettingsField('URL du relais CORS Zen', zenProxyUrl));
+  const zenGuide = makeElement('a', 'btn btn-secondary', 'Guide du relais Zen');
+  zenGuide.href = 'https://github.com/yoyo406/omnichat/blob/master/ZEN_PROXY.md';
+  zenGuide.target = '_blank';
+  zenGuide.rel = 'noopener noreferrer';
+  zenGuide.append(makeIcon('external'));
+  zenConnection.append(zenGuide);
+  body.append(zenConnection);
+
   const zenTools = makeElement('div', 'settings-inline-action');
-  const zenDescription = makeElement('p', 'settings-helper', 'Zen propose plusieurs formats d’API. OmniChat n’affiche que les modèles compatibles avec Chat Completions ; les six gratuits sont déjà intégrés.');
+  const zenDescription = makeElement('p', 'settings-helper', 'Les modèles Zen gratuits compatibles avec Chat Completions sont déjà intégrés. Rafraîchis la liste après avoir configuré le relais pour voir les autres modèles compatibles.');
   const refreshZen = makeElement('button', 'btn btn-secondary', 'Rafraîchir les modèles Zen');
   refreshZen.type = 'button';
   refreshZen.append(makeIcon('download'));
@@ -1338,6 +1389,14 @@ function closeSettings(restoreFocus) {
 }
 
 function saveSettingsFromModal() {
+  const zenProxyInput = byId('settingsZenProxyUrl');
+  const rawZenProxyUrl = zenProxyInput ? zenProxyInput.value.trim() : '';
+  const nextZenProxyUrl = normaliseUrl(rawZenProxyUrl);
+  if (rawZenProxyUrl && !nextZenProxyUrl) {
+    announce('L’URL du relais Zen doit commencer par http:// ou https://.');
+    if (zenProxyInput) zenProxyInput.focus();
+    return;
+  }
   const nextKeys = {};
   PROVIDER_KEYS.forEach(function (providerKey) {
     const input = byId('apiKey-' + providerKey);
@@ -1348,6 +1407,7 @@ function saveSettingsFromModal() {
   state.settings.temperature = clamp(byId('settingsTemperature').value, 0, 2, DEFAULT_SETTINGS.temperature);
   state.settings.maxTokens = Math.round(clamp(byId('settingsMaxTokens').value, 1, 128000, DEFAULT_SETTINGS.maxTokens));
   state.settings.systemPrompt = byId('settingsSystemPrompt').value.trim();
+  state.settings.zenProxyUrl = nextZenProxyUrl;
   saveApiKeys();
   saveSettings();
   closeSettings();
@@ -1356,11 +1416,17 @@ function saveSettingsFromModal() {
 }
 
 async function refreshZenModels(button) {
+  if (!hasZenRelay()) {
+    announce('Configure puis enregistre l’URL de ton relais CORS Zen avant de rafraîchir les modèles.');
+    return;
+  }
   const initialText = button.textContent;
   button.disabled = true;
   button.textContent = 'Actualisation…';
   try {
-    const response = await fetch(PROVIDERS.opencode.baseUrl + '/models');
+    const apiKey = state.apiKeys.opencode;
+    const headers = apiKey ? { Authorization: 'Bearer ' + apiKey } : {};
+    const response = await fetch(endpoint(requestBaseUrl('opencode', PROVIDERS.opencode.baseUrl), '/models'), { headers: headers });
     if (!response.ok) throw await responseError(response);
     const payload = await response.json();
     const candidates = Array.isArray(payload) ? payload : (Array.isArray(payload.data) ? payload.data : []);
@@ -1498,6 +1564,11 @@ async function sendOpenAiCompatible(options) {
   if (options.providerKey === 'opencode' && !zenSupportsChatCompletions(options.modelId)) {
     throw new Error('Ce modèle Zen utilise un autre endpoint que Chat Completions. Choisis un modèle Zen compatible, par exemple Big Pickle ou DeepSeek V4 Flash Free.');
   }
+  if (options.providerKey === 'opencode' && !hasZenRelay()) {
+    const error = new Error('OpenCode Zen bloque le CORS direct. Ouvre Paramètres, renseigne puis enregistre l’URL de ton relais CORS Zen.');
+    error.code = 'ZEN_RELAY_REQUIRED';
+    throw error;
+  }
 
   const headers = {
     'Content-Type': 'application/json',
@@ -1509,7 +1580,7 @@ async function sendOpenAiCompatible(options) {
   }
 
   const body = {
-    model: options.modelId,
+    model: options.providerKey === 'opencode' ? zenApiModelId(options.modelId) : options.modelId,
     messages: options.messages,
     temperature: options.settings.temperature,
     stream: true
@@ -1518,7 +1589,7 @@ async function sendOpenAiCompatible(options) {
      compatible APIs still expect max_tokens, so keep their wire format intact. */
   body[options.providerKey === 'openai' ? 'max_completion_tokens' : 'max_tokens'] = options.settings.maxTokens;
 
-  const response = await fetch(endpoint(options.provider.baseUrl, '/chat/completions'), {
+  const response = await fetch(endpoint(requestBaseUrl(options.providerKey, options.provider.baseUrl), '/chat/completions'), {
     method: 'POST',
     headers: headers,
     body: JSON.stringify(body),
@@ -1651,9 +1722,12 @@ function buildApiMessages(conversation, assistantMessage, systemPrompt) {
 
 function friendlyError(error, provider) {
   if (error && ERROR_MESSAGES[error.status]) return ERROR_MESSAGES[error.status];
+  if (provider === PROVIDERS.opencode && error && error.code === 'ZEN_RELAY_REQUIRED') return error.message;
   if (error && error.name === 'TypeError') {
     if (provider === PROVIDERS.opencode) {
-      return 'OpenCode Zen ne répond pas actuellement aux appels CORS depuis GitHub Pages. Cette app statique ne peut pas contourner ce blocage du fournisseur ; utilise un autre fournisseur ou un proxy que tu contrôles.';
+      return hasZenRelay()
+        ? 'Impossible de joindre le relais OpenCode Zen. Vérifie son URL, son origine autorisée et son déploiement, puis réessaie.'
+        : 'OpenCode Zen bloque le CORS direct. Ajoute l’URL de ton relais CORS Zen dans Paramètres pour l’utiliser depuis GitHub Pages.';
     }
     return 'Impossible de joindre ' + provider.name + '. Vérifie ta connexion et le CORS autorisé par ce fournisseur.';
   }

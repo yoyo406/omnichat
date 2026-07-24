@@ -2,13 +2,13 @@
 
 Application 100 % statique en HTML, CSS et JavaScript vanilla. Elle ne demande ni compte OmniChat, ni build, ni serveur : elle est prévue pour GitHub Pages.
 
-Les clés API, conversations, réglages et préférence de thème sont conservés uniquement dans le `localStorage` du navigateur. Une clé n’est envoyée qu’au fournisseur sélectionné.
+Les clés API, conversations, réglages et préférence de thème sont conservés uniquement dans le `localStorage` du navigateur. Une clé est envoyée uniquement au fournisseur sélectionné, sauf si tu configures volontairement le relais privé OpenCode Zen : dans ce cas, elle transite aussi par ce relais que tu contrôles.
 
 ## Déploiement sur GitHub Pages
 
-1. Place `index.html`, `styles.css`, `app.js` et ce fichier à la racine de la branche `main`.
+1. Place `index.html`, `styles.css`, `app.js` et ce fichier à la racine de la branche utilisée par Pages (`master` dans ce dépôt).
 2. Dans **Settings → Pages**, choisis **Deploy from a branch**.
-3. Sélectionne la branche **main**, puis le dossier **/(root)**, et enregistre.
+3. Sélectionne cette branche, puis le dossier **/(root)**, et enregistre.
 4. Attends la publication sur `https://<utilisateur>.github.io/<dépôt>/`.
 
 Les liens locaux sont relatifs (`./styles.css` et `./app.js`) : l’application fonctionne donc aussi depuis un dépôt servi sous un sous-dossier, comme `/omnichat/`.
@@ -29,9 +29,9 @@ La configuration éditable se trouve au début de [`app.js`](app.js). Les identi
 - OpenAI, Anthropic et Google Gemini disposent de leurs adaptateurs natifs de streaming.
 - xAI, DeepSeek, Qwen, Moonshot et OpenRouter utilisent le format OpenAI-compatible.
 - OpenRouter accepte aussi un identifiant de modèle libre.
-- OpenCode Zen utilise `opencode/<model-id>` et affiche par défaut ses modèles gratuits compatibles avec `chat/completions`. Les autres familles Zen (GPT, Claude, Gemini et Qwen) emploient d’autres endpoints et sont donc filtrées pour éviter une requête invalide.
+- OpenCode Zen affiche par défaut ses modèles gratuits compatibles avec `chat/completions`. L’interface conserve le format `opencode/<model-id>` et envoie l’identifiant API attendu par Zen (`<model-id>`).
 
-Un navigateur ne peut pas contourner le CORS d’un fournisseur. Si une API refuse les appels directs depuis GitHub Pages, OmniChat affiche une erreur exploitable ; la seule solution est que le fournisseur active CORS pour le site ou d’utiliser un proxy que tu contrôles. À ce jour, l’endpoint Zen ne répond pas aux prérequis CORS des appels directs depuis GitHub Pages.
+Un navigateur ne peut pas contourner le CORS d’un fournisseur. Les appels directs configurés ici répondent actuellement au prévol CORS, sauf OpenCode Zen. Pour Zen, OmniChat propose dans les paramètres l’URL d’un relais CORS privé ; le fichier [`ZEN_PROXY_WORKER.js`](ZEN_PROXY_WORKER.js) et le [guide de déploiement](ZEN_PROXY.md) permettent de le configurer sans ajouter de serveur à GitHub Pages.
 
 ## Fichiers
 
@@ -39,6 +39,8 @@ Un navigateur ne peut pas contourner le CORS d’un fournisseur. Si une API refu
 - `styles.css` — design tokens, mise en page responsive et thèmes
 - `app.js` — état local, interfaces, adaptateurs API et streaming SSE
 - `README.md` — installation et limites connues
+- `ZEN_PROXY_WORKER.js` — relais CORS OpenCode Zen à déployer séparément sous ton contrôle
+- `ZEN_PROXY.md` — guide de déploiement et de sécurité du relais
 
 ## Stack
 
