@@ -48,3 +48,7 @@ Un navigateur ne peut pas contourner le CORS d’un fournisseur. Les appels dire
 - CDN : marked, highlight.js et DOMPurify
 - `localStorage` pour les données locales
 - Markdown nettoyé, coloration de code, streaming, annulation, régénération et thème clair/sombre
+
+## Direction visuelle
+
+L’interface utilise les polices **Manrope** et **DM Mono** servies par Google Fonts, ainsi qu’un visuel d’accueil distant issu d’[Unsplash](https://unsplash.com/photos/abstract-swirling-deep-blue-and-purple-light-WZUkUCKToVg). Ces deux ressources ne servent qu’à la présentation : aucune clé API ni donnée de conversation ne leur est transmise. Si le visuel distant est indisponible, le dégradé local de l’écran d’accueil reste visible.

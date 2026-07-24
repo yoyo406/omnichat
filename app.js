@@ -137,6 +137,9 @@ const PROVIDERS = {
 const ZEN_NON_CHAT_COMPLETIONS_PREFIXES = ['gpt-', 'claude-', 'gemini-', 'qwen'];
 
 const PROVIDER_KEYS = Object.keys(PROVIDERS);
+const UI_ASSETS = {
+  welcomeBackdrop: 'https://images.unsplash.com/photo-1761133929722-625cffda1b0a?auto=format&fit=crop&w=1800&q=82'
+};
 const STORAGE = {
   apiKeys: 'omnichat_apiKeys',
   conversations: 'omnichat_conversations',
@@ -204,6 +207,7 @@ const state = {
   pickerKind: null,
   pickerMode: 'options',
   pickerReturnFocus: null,
+  actionDialog: null,
   followOutput: true
 };
 
@@ -211,6 +215,7 @@ let pendingAssistantRender = null;
 let assistantRenderQueued = false;
 let lastFocusedElement = null;
 let settingsFocusProvider = null;
+let actionDialogReturnFocus = null;
 
 function byId(id) {
   return document.getElementById(id);
@@ -246,6 +251,78 @@ function makeActionButton(label, iconName, onClick, extraClass) {
   if (icon) button.append(icon);
   button.addEventListener('click', onClick);
   return button;
+}
+
+function openActionDialog(options) {
+  const config = options || {};
+  const overlay = byId('actionDialog');
+  if (!overlay) return;
+  const activeElement = document.activeElement;
+  const settingsModal = byId('settingsModal');
+  const openedFromSettings = settingsModal && !settingsModal.hidden && settingsModal.contains(activeElement);
+  actionDialogReturnFocus = openedFromSettings && lastFocusedElement && typeof lastFocusedElement.focus === 'function'
+    ? lastFocusedElement
+    : (activeElement && typeof activeElement.focus === 'function' ? activeElement : null);
+  closePicker(false);
+  closeSettings(false);
+
+  state.actionDialog = {
+    hasInput: Boolean(config.hasInput),
+    onConfirm: typeof config.onConfirm === 'function' ? config.onConfirm : function () {}
+  };
+
+  byId('actionDialogIcon').textContent = config.icon || '✦';
+  byId('actionDialogKicker').textContent = config.kicker || 'OMNICHAT';
+  byId('actionDialogTitle').textContent = config.title || 'Confirmer';
+  byId('actionDialogDescription').textContent = config.description || '';
+  const input = byId('actionDialogInput');
+  const inputLabel = byId('actionDialogInputLabel');
+  input.hidden = !state.actionDialog.hasInput;
+  inputLabel.hidden = !state.actionDialog.hasInput;
+  input.value = config.value || '';
+  input.placeholder = config.placeholder || '';
+  inputLabel.textContent = config.inputLabel || 'Valeur';
+  const confirm = byId('actionDialogConfirm');
+  confirm.textContent = config.confirmLabel || 'Confirmer';
+  confirm.className = 'btn ' + (config.danger ? 'btn-danger' : 'btn-primary');
+
+  overlay.hidden = false;
+  overlay.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('action-dialog-open');
+  window.requestAnimationFrame(function () {
+    overlay.classList.add('open');
+    const target = state.actionDialog && state.actionDialog.hasInput ? input : byId('actionDialogCancel');
+    if (target) target.focus();
+    if (state.actionDialog && state.actionDialog.hasInput) input.select();
+  });
+}
+
+function closeActionDialog(restoreFocus) {
+  const overlay = byId('actionDialog');
+  if (!overlay || overlay.hidden) return;
+  overlay.classList.remove('open');
+  overlay.hidden = true;
+  overlay.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('action-dialog-open');
+  state.actionDialog = null;
+  const returnFocus = actionDialogReturnFocus;
+  actionDialogReturnFocus = null;
+  if (restoreFocus !== false && returnFocus && returnFocus.isConnected) returnFocus.focus();
+}
+
+function confirmActionDialog() {
+  const dialog = state.actionDialog;
+  if (!dialog) return;
+  const input = byId('actionDialogInput');
+  const value = dialog.hasInput ? input.value.trim() : '';
+  if (dialog.hasInput && !value) {
+    announce('Saisis un nom avant de continuer.');
+    input.focus();
+    return;
+  }
+  const onConfirm = dialog.onConfirm;
+  closeActionDialog(false);
+  onConfirm(value);
 }
 
 function readJson(key, fallback) {
@@ -719,6 +796,9 @@ function createMessageElement(message) {
   article.classList.add(message.role === 'user' ? 'user' : (message.isError ? 'error' : 'assistant'));
   if (state.streaming && state.streamingMessageId === message.id) article.classList.add('streaming');
 
+  const avatar = makeElement('div', 'message-avatar', message.role === 'user' ? 'VO' : (message.isError ? '!' : '✦'));
+  avatar.setAttribute('aria-hidden', 'true');
+
   const body = makeElement('div', 'message-body');
   const content = makeElement('div', 'msg-content');
   content.dataset.messageContent = message.id;
@@ -751,16 +831,29 @@ function createMessageElement(message) {
   }
 
   body.append(actions);
-  article.append(body);
+  article.append(avatar, body);
   return article;
 }
 
 function renderEmptyState() {
   const container = byId('messagesInner');
   const stateElement = makeElement('div', 'empty-state');
-  stateElement.append(makeElement('div', 'empty-state-icon', '✦'));
-  stateElement.append(makeElement('h2', '', 'Bienvenue sur OmniChat'));
-  stateElement.append(makeElement('p', '', 'Un seul espace pour utiliser plusieurs modèles d’IA. Tes clés API restent dans ce navigateur.'));
+  const visual = makeElement('div', 'empty-visual');
+  visual.setAttribute('aria-hidden', 'true');
+  const visualImage = document.createElement('img');
+  visualImage.src = UI_ASSETS.welcomeBackdrop;
+  visualImage.alt = '';
+  visualImage.loading = 'eager';
+  visualImage.decoding = 'async';
+  visualImage.referrerPolicy = 'no-referrer';
+  const visualMark = makeElement('span', 'empty-visual-mark', '✦');
+  visual.append(visualImage, visualMark);
+
+  const intro = makeElement('div', 'empty-intro');
+  intro.append(makeElement('p', 'empty-eyebrow', 'OMNICHAT · MULTI-MODÈLES'));
+  intro.append(makeElement('h2', '', 'Commence une conversation qui compte.'));
+  intro.append(makeElement('p', '', 'Choisis un modèle, garde le contrôle sur tes clés et travaille dans un espace vraiment à toi.'));
+  stateElement.append(visual, intro);
 
   const hasKey = Object.keys(state.apiKeys).some(function (providerKey) {
     return Boolean(state.apiKeys[providerKey]);
@@ -769,6 +862,8 @@ function renderEmptyState() {
     stateElement.append(makeElement('p', 'empty-state-note', 'Ajoute une clé API pour commencer.'));
   }
 
+  const promptSection = makeElement('div', 'prompt-section');
+  promptSection.append(makeElement('p', 'prompt-section-label', 'Démarrer avec une idée'));
   const prompts = makeElement('div', 'suggested-prompts');
   SUGGESTED_PROMPTS.forEach(function (prompt) {
     const button = makeElement('button', '', prompt);
@@ -781,7 +876,8 @@ function renderEmptyState() {
     });
     prompts.append(button);
   });
-  stateElement.append(prompts);
+  promptSection.append(prompts);
+  stateElement.append(promptSection);
 
   if (!hasKey) {
     const setup = makeElement('div', 'setup-link');
@@ -909,14 +1005,24 @@ function renameConversation(conversationId) {
     return candidate.id === conversationId;
   });
   if (!conversation) return;
-  const nextTitle = window.prompt('Renommer la conversation :', conversationTitle(conversation));
-  if (nextTitle === null) return;
-  const trimmed = nextTitle.trim();
-  if (!trimmed) return;
-  conversation.title = trimmed.slice(0, 120);
-  touchConversation(conversation);
-  saveConversations();
-  renderConversationList();
+  openActionDialog({
+    icon: '✎',
+    kicker: 'CONVERSATION',
+    title: 'Renommer la conversation',
+    description: 'Choisis un titre facile à retrouver dans ton historique.',
+    hasInput: true,
+    inputLabel: 'Nouveau titre',
+    value: conversationTitle(conversation),
+    placeholder: 'Ex. Idées pour mon portfolio',
+    confirmLabel: 'Enregistrer',
+    onConfirm: function (nextTitle) {
+      conversation.title = nextTitle.slice(0, 120);
+      touchConversation(conversation);
+      saveConversations();
+      renderConversationList();
+      announce('Conversation renommée.');
+    }
+  });
 }
 
 function deleteConversation(conversationId) {
@@ -928,25 +1034,34 @@ function deleteConversation(conversationId) {
     return candidate.id === conversationId;
   });
   if (!conversation) return;
-  if (!window.confirm('Supprimer définitivement « ' + conversationTitle(conversation) + ' » ? Cette action est irréversible.')) return;
-
-  state.conversations = state.conversations.filter(function (candidate) {
-    return candidate.id !== conversationId;
-  });
-  if (state.activeConversationId === conversationId) {
-    state.activeConversationId = state.conversations[0] ? state.conversations[0].id : null;
-    const next = getActiveConversation();
-    if (next) {
-      state.selectedProvider = next.provider;
-      state.selectedModel = next.model;
+  const title = conversationTitle(conversation);
+  openActionDialog({
+    icon: '!',
+    kicker: 'SUPPRESSION DÉFINITIVE',
+    title: 'Supprimer cette conversation ?',
+    description: '« ' + title + ' » et tous ses messages seront supprimés de ce navigateur.',
+    confirmLabel: 'Supprimer',
+    danger: true,
+    onConfirm: function () {
+      state.conversations = state.conversations.filter(function (candidate) {
+        return candidate.id !== conversationId;
+      });
+      if (state.activeConversationId === conversationId) {
+        state.activeConversationId = state.conversations[0] ? state.conversations[0].id : null;
+        const next = getActiveConversation();
+        if (next) {
+          state.selectedProvider = next.provider;
+          state.selectedModel = next.model;
+        }
+      }
+      saveConversations();
+      saveSelection();
+      populateSelectors();
+      renderConversationList();
+      renderMessages();
+      announce('Conversation supprimée.');
     }
-  }
-  saveConversations();
-  saveSelection();
-  populateSelectors();
-  renderConversationList();
-  renderMessages();
-  announce('Conversation supprimée.');
+  });
 }
 
 function populateSelectors() {
@@ -1164,7 +1279,8 @@ function openCustomModelForm() {
 function openPicker(kind) {
   if (state.streaming || (kind !== 'provider' && kind !== 'model')) return;
   const modal = byId('settingsModal');
-  if (modal && !modal.hidden) return;
+  const actionDialog = byId('actionDialog');
+  if ((modal && !modal.hidden) || (actionDialog && !actionDialog.hidden)) return;
   state.pickerKind = kind;
   state.pickerMode = 'options';
   state.pickerReturnFocus = document.activeElement && typeof document.activeElement.focus === 'function' ? document.activeElement : null;
@@ -1357,6 +1473,8 @@ function renderSettings() {
 }
 
 function openSettings(focusProviderKey) {
+  const actionDialog = byId('actionDialog');
+  if (actionDialog && !actionDialog.hidden) return;
   const pickerWasOpen = !byId('pickerOverlay').hidden;
   const pickerFocus = state.pickerReturnFocus;
   closePicker(false);
@@ -1462,7 +1580,18 @@ async function refreshZenModels(button) {
 }
 
 function clearAllData() {
-  if (!window.confirm('Tout effacer ? Toutes les conversations, clés API, réglages et préférences de thème seront supprimés de ce navigateur.')) return;
+  openActionDialog({
+    icon: '!',
+    kicker: 'EFFACEMENT LOCAL',
+    title: 'Tout effacer ?',
+    description: 'Toutes les conversations, clés API, réglages et préférences seront supprimés de ce navigateur.',
+    confirmLabel: 'Tout effacer',
+    danger: true,
+    onConfirm: performClearAllData
+  });
+}
+
+function performClearAllData() {
   if (state.abortController) state.abortController.abort();
   state.requestNumber += 1;
   state.streaming = false;
@@ -1916,7 +2045,13 @@ function trapFocus(event, container) {
 function handleDocumentKeydown(event) {
   const picker = byId('pickerOverlay');
   const modal = byId('settingsModal');
+  const actionDialog = byId('actionDialog');
   if (event.key === 'Escape') {
+    if (!actionDialog.hidden) {
+      event.preventDefault();
+      closeActionDialog();
+      return;
+    }
     if (!picker.hidden) {
       event.preventDefault();
       closePicker();
@@ -1936,6 +2071,11 @@ function handleDocumentKeydown(event) {
       event.preventDefault();
       closeSidebar();
     }
+  }
+
+  if (event.key === 'Tab' && !actionDialog.hidden) {
+    trapFocus(event, actionDialog);
+    return;
   }
 
   if (event.key === 'Tab' && !picker.hidden) {
@@ -1990,6 +2130,17 @@ function wireEvents() {
   byId('clearAllBtn').addEventListener('click', clearAllData);
   byId('settingsModal').addEventListener('click', function (event) {
     if (event.target === event.currentTarget) closeSettings();
+  });
+  byId('actionDialogCancel').addEventListener('click', function () { closeActionDialog(); });
+  byId('actionDialogConfirm').addEventListener('click', confirmActionDialog);
+  byId('actionDialogInput').addEventListener('keydown', function (event) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      confirmActionDialog();
+    }
+  });
+  byId('actionDialog').addEventListener('click', function (event) {
+    if (event.target === event.currentTarget) closeActionDialog();
   });
 
   byId('composerForm').addEventListener('submit', function (event) {

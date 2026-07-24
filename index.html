@@ -4,7 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Chat IA multi-fournisseur : vos clés API restent dans votre navigateur.">
+  <meta name="theme-color" content="#121326">
   <title>OmniChat — IA multi-modèles</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
@@ -15,7 +19,15 @@
 
     <aside class="sidebar" id="sidebar" aria-label="Conversations">
       <div class="sidebar-header">
-        <h1>OmniChat</h1>
+        <div class="brand-lockup">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32"><path d="M16 3.5 20 12l8.5 4-8.5 4-4 8.5-4-8.5-8.5-4 8.5-4 4-8.5Z"/><circle cx="16" cy="16" r="3.1"/></svg>
+          </span>
+          <div class="brand-copy">
+            <h1>OmniChat</h1>
+            <span>AI workspace</span>
+          </div>
+        </div>
         <button class="sidebar-close" id="sidebarClose" type="button" aria-label="Fermer le menu">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
         </button>
@@ -64,6 +76,11 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
           </button>
           <span class="sr-only" id="modelDisplayName" aria-live="polite"></span>
+        </div>
+
+        <div class="header-presence" aria-label="Données conservées localement">
+          <span aria-hidden="true"></span>
+          Privé
         </div>
 
         <div class="header-actions">
@@ -132,6 +149,21 @@
       <footer class="modal-footer">
         <button class="btn btn-danger" id="clearAllBtn" type="button">Tout effacer</button>
         <button class="btn btn-primary" id="settingsSaveBtn" type="button">Enregistrer</button>
+      </footer>
+    </section>
+  </div>
+
+  <div class="action-dialog-overlay" id="actionDialog" hidden aria-hidden="true">
+    <section class="action-dialog" role="dialog" aria-modal="true" aria-labelledby="actionDialogTitle" aria-describedby="actionDialogDescription" tabindex="-1">
+      <div class="action-dialog-icon" id="actionDialogIcon" aria-hidden="true">✦</div>
+      <p class="action-dialog-kicker" id="actionDialogKicker">OMNICHAT</p>
+      <h2 id="actionDialogTitle">Confirmer</h2>
+      <p id="actionDialogDescription"></p>
+      <label class="sr-only" id="actionDialogInputLabel" for="actionDialogInput">Nom de la conversation</label>
+      <input id="actionDialogInput" type="text" maxlength="120" autocomplete="off" hidden>
+      <footer class="action-dialog-footer">
+        <button class="btn btn-secondary" id="actionDialogCancel" type="button">Annuler</button>
+        <button class="btn btn-primary" id="actionDialogConfirm" type="button">Confirmer</button>
       </footer>
     </section>
   </div>
