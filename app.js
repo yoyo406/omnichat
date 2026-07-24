@@ -200,6 +200,9 @@ const state = {
   abortController: null,
   requestNumber: 0,
   editingMessageId: null,
+  pickerKind: null,
+  pickerMode: 'options',
+  pickerReturnFocus: null,
   followOutput: true
 };
 
@@ -917,19 +920,7 @@ function deleteConversation(conversationId) {
 }
 
 function populateSelectors() {
-  const providerSelect = byId('providerSelect');
-  providerSelect.replaceChildren();
-  PROVIDER_KEYS.forEach(function (providerKey) {
-    const provider = PROVIDERS[providerKey];
-    const option = new Option(provider.name, providerKey, false, providerKey === state.selectedProvider);
-    providerSelect.add(option);
-  });
-  populateModelSelector();
-}
-
-function populateModelSelector() {
   const provider = PROVIDERS[state.selectedProvider];
-  const modelSelect = byId('modelSelect');
   if (!provider) return;
   const models = modelsFor(state.selectedProvider);
   const hasSelectedModel = models.some(function (model) {
@@ -939,25 +930,24 @@ function populateModelSelector() {
     state.selectedModel = firstModelId(state.selectedProvider);
   }
 
-  modelSelect.replaceChildren();
-  models.forEach(function (model) {
-    const label = model.name + (model.free ? ' · Gratuit' : '');
-    const option = new Option(label, model.id, false, model.id === state.selectedModel);
-    modelSelect.add(option);
-  });
-
-  if (provider.allowCustomModel) {
-    if (!hasSelectedModel && state.selectedModel) {
-      modelSelect.add(new Option(state.selectedModel, state.selectedModel, false, true));
-    }
-    modelSelect.add(new Option('Identifiant personnalisé…', '__custom__'));
-  }
+  const model = modelFor(state.selectedProvider, state.selectedModel);
+  const providerButton = byId('providerMenuBtn');
+  const modelButton = byId('modelMenuBtn');
+  byId('providerMenuValue').textContent = provider.name;
+  byId('modelMenuValue').textContent = model.name + (model.free ? ' · Gratuit' : '');
+  providerButton.setAttribute('aria-label', 'Choisir le fournisseur : ' + provider.name);
+  modelButton.setAttribute('aria-label', 'Choisir le modèle : ' + model.name);
+  updatePickerTriggerState();
   updateModelDisplay();
+}
+
+function populateModelSelector() {
+  populateSelectors();
 }
 
 function updateModelDisplay() {
   const display = byId('modelDisplayName');
-  if (display) display.textContent = formatModelLabel(state.selectedProvider, state.selectedModel);
+  if (display) display.textContent = 'Modèle actif : ' + formatModelLabel(state.selectedProvider, state.selectedModel);
 }
 
 function applySelectionToActiveConversation() {
@@ -969,35 +959,212 @@ function applySelectionToActiveConversation() {
   saveConversations();
 }
 
-function onProviderChange() {
-  const provider = byId('providerSelect').value;
-  if (!knownProvider(provider)) return;
-  state.selectedProvider = provider;
-  state.selectedModel = firstModelId(provider);
+function selectProvider(providerKey) {
+  if (!knownProvider(providerKey)) return;
+  state.selectedProvider = providerKey;
+  state.selectedModel = firstModelId(providerKey);
   state.editingMessageId = null;
   applySelectionToActiveConversation();
   saveSelection();
-  populateModelSelector();
+  populateSelectors();
   renderConversationList();
+  closePicker();
 }
 
-function onModelChange() {
-  const select = byId('modelSelect');
-  const nextValue = select.value;
+function selectModel(nextValue) {
   if (nextValue === '__custom__') {
-    const customModel = window.prompt('Saisis l’identifiant exact du modèle :', state.selectedModel);
-    if (!customModel || !customModel.trim()) {
-      populateModelSelector();
-      return;
-    }
-    state.selectedModel = customModel.trim();
-  } else {
-    state.selectedModel = nextValue;
+    openCustomModelForm();
+    return;
   }
+  if (!nextValue) return;
+  state.selectedModel = nextValue;
   state.editingMessageId = null;
   applySelectionToActiveConversation();
   saveSelection();
-  populateModelSelector();
+  populateSelectors();
+  closePicker();
+}
+
+function updatePickerTriggerState() {
+  const providerButton = byId('providerMenuBtn');
+  const modelButton = byId('modelMenuBtn');
+  if (!providerButton || !modelButton) return;
+  providerButton.setAttribute('aria-expanded', state.pickerKind === 'provider' ? 'true' : 'false');
+  modelButton.setAttribute('aria-expanded', state.pickerKind === 'model' ? 'true' : 'false');
+}
+
+function makePickerOption(label, selected, onSelect, options) {
+  const settings = options || {};
+  const button = makeElement('button', 'picker-option');
+  button.type = 'button';
+  button.setAttribute('role', settings.action ? 'menuitem' : 'menuitemradio');
+  if (!settings.action) button.setAttribute('aria-checked', selected ? 'true' : 'false');
+
+  const text = makeElement('span', 'picker-option-text');
+  text.append(makeElement('span', 'picker-option-label', label));
+  if (settings.detail) text.append(makeElement('span', 'picker-option-detail', settings.detail));
+  button.append(text);
+  if (settings.badge) button.append(makeElement('span', 'picker-option-badge', settings.badge));
+  if (selected) {
+    const check = makeIcon('check');
+    if (check) {
+      check.classList.add('picker-option-check');
+      button.append(check);
+    }
+  }
+  button.addEventListener('click', onSelect);
+  button.addEventListener('keydown', handlePickerOptionKeydown);
+  return button;
+}
+
+function handlePickerOptionKeydown(event) {
+  if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+  const options = Array.from(byId('pickerOptions').querySelectorAll('.picker-option:not([disabled])'));
+  const currentIndex = options.indexOf(event.currentTarget);
+  if (currentIndex === -1 || options.length === 0) return;
+  let nextIndex = currentIndex;
+  if (event.key === 'ArrowDown') nextIndex = (currentIndex + 1) % options.length;
+  if (event.key === 'ArrowUp') nextIndex = (currentIndex - 1 + options.length) % options.length;
+  if (event.key === 'Home') nextIndex = 0;
+  if (event.key === 'End') nextIndex = options.length - 1;
+  event.preventDefault();
+  options[nextIndex].focus();
+}
+
+function renderPicker() {
+  const kind = state.pickerKind;
+  if (!kind) return;
+  const title = byId('pickerTitle');
+  const kicker = byId('pickerKicker');
+  const options = byId('pickerOptions');
+  options.replaceChildren();
+
+  if (state.pickerMode === 'custom') {
+    kicker.textContent = 'OpenRouter ou OpenCode Zen';
+    title.textContent = 'Ajouter un modèle';
+    renderCustomModelForm(options);
+    return;
+  }
+
+  if (kind === 'provider') {
+    kicker.textContent = 'Fournisseurs';
+    title.textContent = 'Choisir un fournisseur';
+    PROVIDER_KEYS.forEach(function (providerKey) {
+      const provider = PROVIDERS[providerKey];
+      options.append(makePickerOption(provider.name, providerKey === state.selectedProvider, function () {
+        selectProvider(providerKey);
+      }));
+    });
+    return;
+  }
+
+  const provider = PROVIDERS[state.selectedProvider];
+  const models = modelsFor(state.selectedProvider);
+  const hasSelectedModel = models.some(function (model) {
+    return model.id === state.selectedModel;
+  });
+  kicker.textContent = provider.name;
+  title.textContent = 'Choisir un modèle';
+  if (!hasSelectedModel && state.selectedModel) {
+    options.append(makePickerOption(state.selectedModel, true, function () {
+      selectModel(state.selectedModel);
+    }, { detail: 'Identifiant personnalisé' }));
+  }
+  models.forEach(function (model) {
+    options.append(makePickerOption(model.name, model.id === state.selectedModel, function () {
+      selectModel(model.id);
+    }, { badge: model.free ? 'Gratuit' : '' }));
+  });
+  if (provider.allowCustomModel) {
+    options.append(makePickerOption('Ajouter un identifiant personnalisé', false, function () {
+      selectModel('__custom__');
+    }, { action: true, detail: 'Par exemple : fournisseur/modèle' }));
+  }
+}
+
+function renderCustomModelForm(container) {
+  const form = makeElement('form', 'picker-custom-form');
+  const help = makeElement('p', 'picker-custom-help', 'Saisis l’identifiant exact communiqué par le fournisseur.');
+  const input = makeElement('input');
+  input.type = 'text';
+  input.id = 'customModelInput';
+  input.value = state.selectedModel || '';
+  input.placeholder = 'fournisseur/modèle';
+  input.autocomplete = 'off';
+  input.spellcheck = false;
+  input.setAttribute('aria-label', 'Identifiant du modèle personnalisé');
+  const actions = makeElement('div', 'picker-custom-actions');
+  const cancel = makeElement('button', 'btn btn-secondary', 'Retour');
+  cancel.type = 'button';
+  cancel.addEventListener('click', function () {
+    state.pickerMode = 'options';
+    renderPicker();
+  });
+  const confirm = makeElement('button', 'btn btn-primary', 'Utiliser ce modèle');
+  confirm.type = 'submit';
+  actions.append(cancel, confirm);
+  form.append(help, input, actions);
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    const customModel = input.value.trim();
+    if (!customModel) {
+      announce('Saisis un identifiant de modèle avant de continuer.');
+      input.focus();
+      return;
+    }
+    state.selectedModel = customModel;
+    state.editingMessageId = null;
+    applySelectionToActiveConversation();
+    saveSelection();
+    populateSelectors();
+    closePicker();
+  });
+  container.append(form);
+}
+
+function openCustomModelForm() {
+  state.pickerMode = 'custom';
+  renderPicker();
+  window.requestAnimationFrame(function () {
+    const input = byId('customModelInput');
+    if (input) input.focus();
+  });
+}
+
+function openPicker(kind) {
+  if (state.streaming || (kind !== 'provider' && kind !== 'model')) return;
+  const modal = byId('settingsModal');
+  if (modal && !modal.hidden) return;
+  state.pickerKind = kind;
+  state.pickerMode = 'options';
+  state.pickerReturnFocus = document.activeElement && typeof document.activeElement.focus === 'function' ? document.activeElement : null;
+  renderPicker();
+  const overlay = byId('pickerOverlay');
+  overlay.hidden = false;
+  overlay.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('picker-open');
+  updatePickerTriggerState();
+  window.requestAnimationFrame(function () {
+    overlay.classList.add('open');
+    const selected = overlay.querySelector('[aria-checked="true"]');
+    const first = selected || overlay.querySelector('.picker-option, #customModelInput, #pickerClose');
+    if (first && typeof first.focus === 'function') first.focus();
+  });
+}
+
+function closePicker(restoreFocus) {
+  const overlay = byId('pickerOverlay');
+  if (!overlay || overlay.hidden) return;
+  overlay.classList.remove('open');
+  overlay.hidden = true;
+  overlay.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('picker-open');
+  const returnFocus = state.pickerReturnFocus;
+  state.pickerKind = null;
+  state.pickerMode = 'options';
+  state.pickerReturnFocus = null;
+  updatePickerTriggerState();
+  if (restoreFocus !== false && returnFocus && returnFocus.isConnected) returnFocus.focus();
 }
 
 function resizeTextarea() {
@@ -1014,12 +1181,13 @@ function updateComposer() {
   const textarea = byId('composerTextarea');
   const send = byId('sendBtn');
   const stop = byId('stopBtn');
-  const provider = byId('providerSelect');
-  const model = byId('modelSelect');
+  const provider = byId('providerMenuBtn');
+  const model = byId('modelMenuBtn');
   const hasText = Boolean(textarea.value.trim());
   textarea.disabled = state.streaming;
   provider.disabled = state.streaming;
   model.disabled = state.streaming;
+  if (state.streaming) closePicker(false);
   send.hidden = state.streaming;
   stop.hidden = !state.streaming;
   send.disabled = state.streaming || !hasText;
@@ -1138,7 +1306,10 @@ function renderSettings() {
 }
 
 function openSettings(focusProviderKey) {
-  lastFocusedElement = document.activeElement;
+  const pickerWasOpen = !byId('pickerOverlay').hidden;
+  const pickerFocus = state.pickerReturnFocus;
+  closePicker(false);
+  lastFocusedElement = pickerWasOpen && pickerFocus ? pickerFocus : document.activeElement;
   settingsFocusProvider = knownProvider(focusProviderKey) ? focusProviderKey : null;
   renderSettings();
   const modal = byId('settingsModal');
@@ -1652,9 +1823,31 @@ function retryAssistantMessage(messageId) {
   startAssistantResponse(conversation, original.providerKey || state.selectedProvider, original.modelId || state.selectedModel);
 }
 
+function trapFocus(event, container) {
+  const focusable = Array.from(container.querySelectorAll('button:not([disabled]), input:not([disabled]), textarea:not([disabled]), a[href]')).filter(function (element) {
+    return !element.hidden;
+  });
+  if (focusable.length === 0) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
 function handleDocumentKeydown(event) {
+  const picker = byId('pickerOverlay');
   const modal = byId('settingsModal');
   if (event.key === 'Escape') {
+    if (!picker.hidden) {
+      event.preventDefault();
+      closePicker();
+      return;
+    }
     if (!modal.hidden) {
       event.preventDefault();
       closeSettings();
@@ -1671,20 +1864,13 @@ function handleDocumentKeydown(event) {
     }
   }
 
+  if (event.key === 'Tab' && !picker.hidden) {
+    trapFocus(event, picker);
+    return;
+  }
+
   if (event.key === 'Tab' && !modal.hidden) {
-    const focusable = Array.from(modal.querySelectorAll('button:not([disabled]), input:not([disabled]), textarea:not([disabled]), a[href]')).filter(function (element) {
-      return !element.hidden;
-    });
-    if (focusable.length === 0) return;
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
+    trapFocus(event, modal);
   }
 }
 
@@ -1705,8 +1891,23 @@ function wireEvents() {
   byId('sidebarOverlay').addEventListener('click', closeSidebar);
   byId('searchConv').addEventListener('input', renderConversationList);
 
-  byId('providerSelect').addEventListener('change', onProviderChange);
-  byId('modelSelect').addEventListener('change', onModelChange);
+  byId('providerMenuBtn').addEventListener('click', function () { openPicker('provider'); });
+  byId('modelMenuBtn').addEventListener('click', function () { openPicker('model'); });
+  [
+    { id: 'providerMenuBtn', kind: 'provider' },
+    { id: 'modelMenuBtn', kind: 'model' }
+  ].forEach(function (control) {
+    byId(control.id).addEventListener('keydown', function (event) {
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        openPicker(control.kind);
+      }
+    });
+  });
+  byId('pickerClose').addEventListener('click', function () { closePicker(); });
+  byId('pickerOverlay').addEventListener('click', function (event) {
+    if (event.target === event.currentTarget) closePicker();
+  });
   byId('themeToggle').addEventListener('click', toggleTheme);
   byId('settingsBtn').addEventListener('click', function () { openSettings(); });
   byId('headerSettingsBtn').addEventListener('click', function () { openSettings(); });
