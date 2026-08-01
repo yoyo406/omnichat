@@ -22,6 +22,13 @@ Les liens locaux sont relatifs (`./styles.css` et `./app.js`) : l’application 
 
 `Ctrl`/`Cmd` + `Entrée` envoie le message. `Maj` + `Entrée` ajoute une ligne et `Échap` annule une édition. Sur mobile, utilise le bouton menu pour ouvrir les conversations.
 
+## Sécurité & données
+
+- Une **Content-Security-Policy** est déclarée dans `index.html` : seuls les scripts des CDNs de `marked`, `DOMPurify` et `highlight.js` sont autorisés, et ces scripts sont vérifiés par **SRI** (intégrité sous-resource). Les connexions réseau sont limitées aux fournisseurs configurés et au relais Zen (`*.workers.dev` + `localhost` pour le dev).
+- La clé API **Gemini** est envoyée dans l’en-tête `x-goog-api-key` et non plus dans l’URL, afin d’éviter les fuites via historique ou journaux.
+- Les **conversations et réglages** peuvent être exportés et réimportés depuis **Paramètres → Données**. L’export ne contient jamais les clés API ; l’import ajoute les conversations sans écraser les existantes.
+- En cas de **quota localStorage** dépassé, OmniChat tente de conserver les conversations les plus récentes et prévient l’utilisateur plutôt que de perdre silencieusement les données.
+
 ## Fournisseurs
 
 La configuration éditable se trouve au début de [`app.js`](app.js). Les identifiants de modèles et URLs y sont regroupés par fournisseur.

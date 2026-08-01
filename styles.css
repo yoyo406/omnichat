@@ -1698,3 +1698,7 @@ body.modal-open,body.picker-open,body.action-dialog-open{overflow:hidden}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
 }
+
+/* During streaming, message content is shown as plain text to avoid
+   re-parsing markdown on every animation frame. Preserve whitespace. */
+.message.streaming .msg-content{white-space:pre-wrap;overflow-wrap:anywhere}

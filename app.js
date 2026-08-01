@@ -156,6 +156,14 @@ const DEFAULT_SETTINGS = {
   zenProxyUrl: ''
 };
 
+/* Maximum wait for a provider response before the request is aborted locally. */
+const REQUEST_TIMEOUT_MS = 120000;
+/* Automatic retry on rate-limit (429) responses. */
+const MAX_AUTO_RETRIES = 1;
+const RETRY_DELAY_MS = 2500;
+/* Rough character budget for the conversation context sent to providers. */
+const MAX_CONTEXT_CHARS = 100000;
+
 const SUGGESTED_PROMPTS = [
   'Explique-moi le théorème de Pythagore simplement',
   'Écris un script Python pour analyser un fichier CSV',
@@ -340,8 +348,25 @@ function writeJson(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
     return true;
   } catch (error) {
+    /* When local storage is full, try to make room by keeping only the most
+       recent conversations (they are sorted newest-first) and retry once. */
+    if (error && error.name === 'QuotaExceededError' && key === STORAGE.conversations && Array.isArray(value) && value.length > 1) {
+      const kept = value.slice(0, Math.max(1, Math.floor(value.length / 2)));
+      try {
+        localStorage.setItem(key, JSON.stringify(kept));
+        const keptIds = new Set(kept.map(function (conversation) { return conversation.id; }));
+        state.conversations = state.conversations.filter(function (conversation) { return keptIds.has(conversation.id); });
+        if (!keptIds.has(state.activeConversationId)) {
+          state.activeConversationId = state.conversations[0] ? state.conversations[0].id : null;
+        }
+        announce('Espace local saturé : les conversations les plus anciennes ont été supprimées pour faire de la place.');
+        return true;
+      } catch (retryError) {
+        /* fall through to the generic message */
+      }
+    }
     console.error('Impossible d’écrire dans le stockage local.', error);
-    announce('Impossible d’enregistrer localement. Vérifie l’espace disponible dans le navigateur.');
+    announce('Impossible d’enregistrer localement. Vérifie l’espace disponible ou exporte tes conversations depuis les paramètres.');
     return false;
   }
 }
@@ -350,6 +375,10 @@ function clamp(value, minimum, maximum, fallback) {
   const number = Number(value);
   if (!Number.isFinite(number)) return fallback;
   return Math.min(maximum, Math.max(minimum, number));
+}
+
+function sliceByCodePoints(value, max) {
+  return Array.from(String(value || '')).slice(0, max).join('');
 }
 
 function generateId() {
@@ -451,7 +480,8 @@ function conversationTitle(conversation) {
   });
   if (!firstMessage) return 'Nouveau chat';
   const compact = firstMessage.content.replace(/\s+/g, ' ').trim();
-  return compact.length > 54 ? compact.slice(0, 54) + '…' : compact;
+  const titlePoints = Array.from(compact);
+  return titlePoints.length > 54 ? titlePoints.slice(0, 54).join('') + '…' : compact;
 }
 
 function normaliseMessage(message) {
@@ -524,8 +554,21 @@ function loadState() {
   state.themePreference = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'system';
 }
 
+let saveConversationsTimer = null;
 function saveConversations() {
-  writeJson(STORAGE.conversations, state.conversations);
+  if (saveConversationsTimer) window.clearTimeout(saveConversationsTimer);
+  saveConversationsTimer = window.setTimeout(function () {
+    saveConversationsTimer = null;
+    writeJson(STORAGE.conversations, state.conversations);
+  }, 150);
+}
+
+function flushSaveConversations() {
+  if (saveConversationsTimer) {
+    window.clearTimeout(saveConversationsTimer);
+    saveConversationsTimer = null;
+    writeJson(STORAGE.conversations, state.conversations);
+  }
 }
 
 function saveApiKeys() {
@@ -846,6 +889,7 @@ function renderEmptyState() {
   visualImage.loading = 'eager';
   visualImage.decoding = 'async';
   visualImage.referrerPolicy = 'no-referrer';
+  visualImage.onerror = function () { if (visualImage.parentNode) visualImage.remove(); };
   const visualMark = makeElement('span', 'empty-visual-mark', '✦');
   visual.append(visualImage, visualMark);
 
@@ -899,9 +943,26 @@ function renderMessages() {
     return;
   }
 
+  /* Reuse existing DOM nodes for unchanged messages so code blocks are not
+     re-highlighted on every render (conversation switches, edits, retries). */
+  const existing = new Map();
+  Array.from(container.querySelectorAll('[data-message-id]')).forEach(function (element) {
+    existing.set(element.dataset.messageId, element);
+  });
+
   const fragment = document.createDocumentFragment();
   conversation.messages.forEach(function (message) {
-    fragment.append(createMessageElement(message));
+    const signature = message.content + '\u0001' + (message.isError ? 1 : 0) + (message.stopped ? 1 : 0)
+      + (state.streamingMessageId === message.id ? 1 : 0) + (state.editingMessageId === message.id ? 1 : 0)
+      + (state.streaming ? 1 : 0);
+    const previous = existing.get(message.id);
+    if (previous && previous.dataset.sig === signature) {
+      fragment.append(previous);
+    } else {
+      const element = createMessageElement(message);
+      element.dataset.sig = signature;
+      fragment.append(element);
+    }
   });
   container.replaceChildren(fragment);
   updateScrollButton();
@@ -918,9 +979,15 @@ function queueAssistantRender(message) {
     if (!pending) return;
     const messageElement = byId('message-' + pending.id);
     const content = messageElement ? messageElement.querySelector('[data-message-content]') : null;
-    if (content) renderRichContent(content, pending.content);
+    if (content) {
+      if (state.streaming && state.streamingMessageId === pending.id) {
+        content.textContent = pending.content || 'Réponse en cours…';
+      } else {
+        renderRichContent(content, pending.content);
+      }
+    }
     if (messageElement) messageElement.classList.add('streaming');
-    if (state.followOutput) scrollToBottom();
+    if (state.followOutput) scrollToBottom(false);
     else updateScrollButton();
   });
 }
@@ -984,7 +1051,22 @@ function renderConversationList() {
   });
 }
 
+function debounce(fn, ms) {
+  let timer = null;
+  return function () {
+    const context = this, args = arguments;
+    window.clearTimeout(timer);
+    timer = window.setTimeout(function () { timer = null; fn.apply(context, args); }, ms);
+  };
+}
+
+const debouncedRenderConversationList = debounce(renderConversationList, 150);
+
 function selectConversation(conversationId) {
+  if (state.streaming) {
+    announce('Arrête la réponse en cours avant de changer de conversation.');
+    return;
+  }
   const conversation = state.conversations.find(function (candidate) {
     return candidate.id === conversationId;
   });
@@ -1016,7 +1098,7 @@ function renameConversation(conversationId) {
     placeholder: 'Ex. Idées pour mon portfolio',
     confirmLabel: 'Enregistrer',
     onConfirm: function (nextTitle) {
-      conversation.title = nextTitle.slice(0, 120);
+      conversation.title = sliceByCodePoints(nextTitle, 120);
       touchConversation(conversation);
       saveConversations();
       renderConversationList();
@@ -1470,6 +1552,20 @@ function renderSettings() {
   systemPrompt.rows = 4;
   systemPrompt.value = state.settings.systemPrompt;
   body.append(makeSettingsField('System prompt global', systemPrompt));
+
+  body.append(makeElement('h3', '', 'Données'));
+  const dataRow = makeElement('div', 'settings-row');
+  const exportBtn = makeElement('button', 'btn btn-secondary', 'Exporter les conversations');
+  exportBtn.id = 'exportDataBtn';
+  exportBtn.type = 'button';
+  exportBtn.append(makeIcon('download'));
+  const importBtn = makeElement('button', 'btn btn-secondary', 'Importer un fichier');
+  importBtn.id = 'importDataBtn';
+  importBtn.type = 'button';
+  importBtn.append(makeIcon('external'));
+  dataRow.append(exportBtn, importBtn);
+  body.append(dataRow);
+  body.append(makeElement('p', 'settings-helper', 'L’export contient tes conversations et réglages (pas les clés API). L’import ajoute les conversations sans écraser les existantes.'));
 }
 
 function openSettings(focusProviderKey) {
@@ -1544,7 +1640,8 @@ async function refreshZenModels(button) {
   try {
     const apiKey = state.apiKeys.opencode;
     const headers = apiKey ? { Authorization: 'Bearer ' + apiKey } : {};
-    const response = await fetch(endpoint(requestBaseUrl('opencode', PROVIDERS.opencode.baseUrl), '/models'), { headers: headers });
+    const supportsTimeout = typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function';
+    const response = await fetch(endpoint(requestBaseUrl('opencode', PROVIDERS.opencode.baseUrl), '/models'), { headers: headers, signal: supportsTimeout ? AbortSignal.timeout(30000) : undefined });
     if (!response.ok) throw await responseError(response);
     const payload = await response.json();
     const candidates = Array.isArray(payload) ? payload : (Array.isArray(payload.data) ? payload.data : []);
@@ -1577,6 +1674,93 @@ async function refreshZenModels(button) {
     button.textContent = initialText;
     button.prepend(makeIcon('download'));
   }
+}
+
+function exportData() {
+  const payload = {
+    app: 'omnichat',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    conversations: state.conversations,
+    settings: {
+      temperature: state.settings.temperature,
+      maxTokens: state.settings.maxTokens,
+      systemPrompt: state.settings.systemPrompt,
+      zenProxyUrl: state.settings.zenProxyUrl
+    },
+    selection: { provider: state.selectedProvider, model: state.selectedModel }
+  };
+  try {
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'omnichat-export-' + new Date().toISOString().slice(0, 10) + '.json';
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    announce('Export des conversations prêt.');
+  } catch (error) {
+    announce('L’export a échoué.');
+  }
+}
+
+function importDataFromFile() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json,.json';
+  input.addEventListener('change', function () {
+    const file = input.files && input.files[0];
+    if (file) importDataFile(file);
+  });
+  input.click();
+}
+
+function importDataFile(file) {
+  const reader = new FileReader();
+  reader.onload = function () {
+    let data;
+    try {
+      data = JSON.parse(reader.result);
+    } catch (error) {
+      announce('Import impossible : fichier JSON invalide.');
+      return;
+    }
+    if (!data || typeof data !== 'object') {
+      announce('Import impossible : fichier JSON invalide.');
+      return;
+    }
+    const incoming = Array.isArray(data.conversations) ? data.conversations.map(normaliseConversation).filter(Boolean) : [];
+    if (incoming.length === 0) {
+      announce('Aucune conversation valide dans ce fichier.');
+      return;
+    }
+    const existingIds = new Set(state.conversations.map(function (conversation) { return conversation.id; }));
+    const added = incoming.filter(function (conversation) { return !existingIds.has(conversation.id); });
+    if (added.length === 0) {
+      announce('Ces conversations sont déjà présentes.');
+      return;
+    }
+    state.conversations = added.concat(state.conversations);
+    state.conversations.sort(function (a, b) { return b.updatedAt - a.updatedAt; });
+    if (data.settings && typeof data.settings === 'object') {
+      state.settings.temperature = clamp(data.settings.temperature, 0, 2, state.settings.temperature);
+      state.settings.maxTokens = Math.round(clamp(data.settings.maxTokens, 1, 128000, state.settings.maxTokens));
+      state.settings.systemPrompt = typeof data.settings.systemPrompt === 'string' ? data.settings.systemPrompt : state.settings.systemPrompt;
+      state.settings.zenProxyUrl = normaliseUrl(data.settings.zenProxyUrl);
+      saveSettings();
+    }
+    if (!state.activeConversationId && state.conversations[0]) state.activeConversationId = state.conversations[0].id;
+    saveConversations();
+    saveSelection();
+    populateSelectors();
+    renderConversationList();
+    renderMessages();
+    announce(added.length + ' conversation(s) importée(s).');
+  };
+  reader.onerror = function () { announce('Lecture du fichier impossible.'); };
+  reader.readAsText(file);
 }
 
 function clearAllData() {
@@ -1667,7 +1851,8 @@ async function consumeSse(response, onData) {
     const data = block.split(/\r?\n/).filter(function (line) {
       return line.indexOf('data:') === 0;
     }).map(function (line) {
-      return line.slice(5).trimStart();
+      const value = line.slice(5);
+      return value.charAt(0) === ' ' ? value.slice(1) : value;
     }).join('\n').trim();
     if (data) onData(data);
   }
@@ -1807,10 +1992,10 @@ async function sendGemini(options) {
   };
   if (system) body.systemInstruction = { parts: [{ text: system }] };
 
-  const url = endpoint(options.provider.baseUrl, '/models/') + encodeURIComponent(options.modelId) + ':streamGenerateContent?alt=sse&key=' + encodeURIComponent(options.apiKey);
+  const url = endpoint(options.provider.baseUrl, '/models/') + encodeURIComponent(options.modelId) + ':streamGenerateContent?alt=sse';
   const response = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': options.apiKey },
     body: JSON.stringify(body),
     signal: options.signal
   });
@@ -1846,7 +2031,25 @@ function buildApiMessages(conversation, assistantMessage, systemPrompt) {
       messages.push({ role: message.role, content: message.content });
     }
   });
-  return messages;
+  return trimContext(messages, MAX_CONTEXT_CHARS);
+}
+
+/* Keep the most recent messages within a rough character budget so long
+   conversations do not exceed provider limits. The system prompt is preserved. */
+function trimContext(messages, maxChars) {
+  if (messages.length <= 1) return messages;
+  let total = 0;
+  messages.forEach(function (message) { total += message.content ? message.content.length : 0; });
+  if (total <= maxChars) return messages;
+  const hasSystem = messages[0] && messages[0].role === 'system';
+  const system = hasSystem ? [messages[0]] : [];
+  const rest = hasSystem ? messages.slice(1) : messages;
+  let drop = 0;
+  while (drop < rest.length && total > maxChars) {
+    total -= rest[drop].content ? rest[drop].content.length : 0;
+    drop += 1;
+  }
+  return system.concat(rest.slice(drop));
 }
 
 function friendlyError(error, provider) {
@@ -1917,52 +2120,103 @@ async function startAssistantResponse(conversation, providerKey, modelId) {
     maxTokens: state.settings.maxTokens,
     systemPrompt: state.settings.systemPrompt
   };
-  const messages = buildApiMessages(conversation, assistantMessage, settings.systemPrompt);
 
-  try {
-    await adapter({
-      provider: provider,
-      providerKey: providerKey,
-      apiKey: apiKey,
-      modelId: modelId,
-      messages: messages,
-      settings: settings,
-      signal: state.abortController.signal,
-      onToken: function (token) {
-        if (requestNumber !== state.requestNumber) return;
-        assistantMessage.content += token;
-        queueAssistantRender(assistantMessage);
-      }
-    });
+  function finalizeStream() {
     if (requestNumber !== state.requestNumber) return;
-    if (!assistantMessage.content.trim()) {
-      markAssistantError(conversation, assistantMessage, new Error('Le fournisseur n’a renvoyé aucun texte.'), provider);
-      return;
+    state.streaming = false;
+    state.streamingMessageId = null;
+    state.abortController = null;
+    renderConversationList();
+    renderMessages();
+    updateComposer();
+    updateScrollButton();
+  }
+
+  /* One streaming attempt. Aborts on inactivity (no token for a while) rather
+     than a flat total timeout, so long legitimate generations are not killed. */
+  async function streamOnce(attempt) {
+    const messages = buildApiMessages(conversation, assistantMessage, settings.systemPrompt);
+    state.abortController = new AbortController();
+    const controller = state.abortController;
+    let timedOut = false;
+    let inactivityId = window.setTimeout(function () {
+      timedOut = true;
+      try { controller.abort(); } catch (abortError) { /* ignore */ }
+    }, REQUEST_TIMEOUT_MS);
+    function resetInactivity() {
+      window.clearTimeout(inactivityId);
+      inactivityId = window.setTimeout(function () {
+        timedOut = true;
+        try { controller.abort(); } catch (abortError) { /* ignore */ }
+      }, REQUEST_TIMEOUT_MS);
     }
-    touchConversation(conversation);
-    saveConversations();
-    announce('Réponse terminée.');
-  } catch (error) {
-    if (requestNumber !== state.requestNumber) return;
-    if (error && error.name === 'AbortError') {
-      assistantMessage.stopped = true;
+    let retryScheduled = false;
+    try {
+      await adapter({
+        provider: provider,
+        providerKey: providerKey,
+        apiKey: apiKey,
+        modelId: modelId,
+        messages: messages,
+        settings: settings,
+        signal: controller.signal,
+        onToken: function (token) {
+          if (requestNumber !== state.requestNumber) return;
+          resetInactivity();
+          assistantMessage.content += token;
+          queueAssistantRender(assistantMessage);
+        }
+      });
+      if (requestNumber !== state.requestNumber) return;
+      if (!assistantMessage.content.trim()) {
+        markAssistantError(conversation, assistantMessage, new Error('Le fournisseur n’a renvoyé aucun texte.'), provider);
+        return;
+      }
       touchConversation(conversation);
       saveConversations();
-      announce('Génération interrompue.');
-    } else {
-      markAssistantError(conversation, assistantMessage, error, provider);
-    }
-  } finally {
-    if (requestNumber === state.requestNumber) {
-      state.streaming = false;
-      state.streamingMessageId = null;
-      state.abortController = null;
-      renderConversationList();
-      renderMessages();
-      updateComposer();
-      updateScrollButton();
+      announce('Réponse terminée.');
+    } catch (error) {
+      if (requestNumber !== state.requestNumber) return;
+      if (error && error.status === 429 && attempt < MAX_AUTO_RETRIES) {
+        retryScheduled = true;
+        assistantMessage.content = '';
+        assistantMessage.isError = false;
+        announce('Limite de débit atteinte. Nouvel essai automatique dans ' + (RETRY_DELAY_MS / 1000) + ' s…');
+        renderMessages();
+        window.setTimeout(function () {
+          if (requestNumber !== state.requestNumber) return;
+          /* If the user pressed stop during the wait, honour it. */
+          if (state.abortController && state.abortController.signal.aborted) {
+            assistantMessage.stopped = true;
+            touchConversation(conversation);
+            saveConversations();
+            announce('Génération interrompue.');
+            finalizeStream();
+            return;
+          }
+          streamOnce(attempt + 1);
+        }, RETRY_DELAY_MS);
+        return;
+      }
+      if (error && error.name === 'AbortError') {
+        if (timedOut) {
+          markAssistantError(conversation, assistantMessage, new ProviderRequestError(408, ERROR_MESSAGES[408]), provider);
+        } else {
+          assistantMessage.stopped = true;
+          touchConversation(conversation);
+          saveConversations();
+          announce('Génération interrompue.');
+        }
+      } else {
+        markAssistantError(conversation, assistantMessage, error, provider);
+      }
+    } finally {
+      window.clearTimeout(inactivityId);
+      if (!retryScheduled) finalizeStream();
     }
   }
+
+  streamOnce(0);
 }
 
 function sendMessage(text) {
@@ -2103,7 +2357,7 @@ function wireEvents() {
   byId('sidebarToggleSide').addEventListener('click', closeSidebar);
   byId('sidebarClose').addEventListener('click', closeSidebar);
   byId('sidebarOverlay').addEventListener('click', closeSidebar);
-  byId('searchConv').addEventListener('input', renderConversationList);
+  byId('searchConv').addEventListener('input', debouncedRenderConversationList);
 
   byId('providerMenuBtn').addEventListener('click', function () { openPicker('provider'); });
   byId('modelMenuBtn').addEventListener('click', function () { openPicker('model'); });
@@ -2128,6 +2382,8 @@ function wireEvents() {
   byId('settingsClose').addEventListener('click', function () { closeSettings(); });
   byId('settingsSaveBtn').addEventListener('click', saveSettingsFromModal);
   byId('clearAllBtn').addEventListener('click', clearAllData);
+  byId('exportDataBtn').addEventListener('click', exportData);
+  byId('importDataBtn').addEventListener('click', importDataFromFile);
   byId('settingsModal').addEventListener('click', function (event) {
     if (event.target === event.currentTarget) closeSettings();
   });
@@ -2172,6 +2428,8 @@ function wireEvents() {
     setSidebarOpen(byId('sidebar').classList.contains('open'));
     updateScrollButton();
   });
+  /* Flush any pending debounced save when the page is closed or cached. */
+  window.addEventListener('pagehide', flushSaveConversations);
   if (window.matchMedia) {
     const query = window.matchMedia('(prefers-color-scheme: dark)');
     query.addEventListener('change', function () {

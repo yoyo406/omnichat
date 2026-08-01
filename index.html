@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Chat IA multi-fournisseur : vos clés API restent dans votre navigateur.">
   <meta name="theme-color" content="#121326">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com https://api.x.ai https://api.deepseek.com https://dashscope-intl.aliyuncs.com https://api.moonshot.ai https://openrouter.ai https://opencode.ai https://*.workers.dev http://localhost:* http://127.0.0.1:*; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'">
   <title>OmniChat — IA multi-modèles</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -168,9 +169,9 @@
     </section>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/marked@15.0.7/marked.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.5/dist/purify.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@15.0.7/marked.min.js" defer crossorigin="anonymous" integrity="sha384-H+hy9ULve6xfxRkWIh/YOtvDdpXgV2fmAGQkIDTxIgZwNoaoBal14Di2YTMR6MzR"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.5/dist/purify.min.js" defer crossorigin="anonymous" integrity="sha384-qSFej5dZNviyoPgYJ5+Xk4bEbX8AYddxAHPuzs1aSgRiXxJ3qmyWNaPsRkpv/+x5"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js" defer crossorigin="anonymous" integrity="sha384-RH2xi4eIQ/gjtbs9fUXM68sLSi99C7ZWBRX1vDrVv6GQXRibxXLbwO2NGZB74MbU"></script>
   <script type="module" src="./app.js"></script>
 </body>
 </html>
