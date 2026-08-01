@@ -225,7 +225,7 @@ ul{list-style:none}
   flex-shrink:0;
 }
 .conversation-item .conv-actions{
-  display:none;
+  display:flex;
   gap:2px;
   position:absolute;
   right:6px;
@@ -234,8 +234,14 @@ ul{list-style:none}
   background:inherit;
   padding-left:8px;
 }
-.conversation-item:hover .conv-actions,
-.conversation-item:focus-within .conv-actions{display:flex}
+/* On precise-pointer (mouse) devices, hide per-row actions until hover/focus
+   to keep the list clean. Touch devices have no hover, so actions stay visible
+   or rename/delete would be unreachable. */
+@media (hover:hover) and (pointer:fine){
+  .conversation-item .conv-actions{display:none}
+  .conversation-item:hover .conv-actions,
+  .conversation-item:focus-within .conv-actions{display:flex}
+}
 .conv-action-btn{
   width:30px;height:30px;
   display:flex;align-items:center;justify-content:center;
